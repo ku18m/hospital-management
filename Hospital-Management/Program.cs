@@ -2,6 +2,7 @@ using Hospital_Management.Data;
 using Hospital_Management.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hospital_Management
 {
@@ -19,7 +20,11 @@ namespace Hospital_Management
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddSignInManager<SignInManager<ApplicationUser>>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddRazorPages();
 
             builder.Services.AddControllersWithViews();
 
@@ -37,7 +42,7 @@ namespace Hospital_Management
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
