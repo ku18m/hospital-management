@@ -26,4 +26,8 @@
     <Folder Include="Areas\DoctorPortal\Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Ibrahim\" />
+  </ItemGroup>
+
 </Project>
