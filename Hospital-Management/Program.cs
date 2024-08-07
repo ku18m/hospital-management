@@ -41,6 +41,15 @@ namespace Hospital_Management
 
             app.UseAuthorization();
 
+            // Add the following code to the Main method in Program.cs to enable routing for areas:
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                  name: "areas",
+                  pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                );
+            });
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
