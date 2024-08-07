@@ -7,7 +7,7 @@ namespace Hospital_Management.Repository
 {
     public class RecordRepo(ApplicationDbContext context) : IRecordRepo
     {
-        void IRepository<Record>.Delete(int id)
+        public void Delete(int id)
         {
             var record = context.Records.Find(id);
             if (record != null)
@@ -16,30 +16,30 @@ namespace Hospital_Management.Repository
             }
         }
 
-        List<Record> IRepository<Record>.GetAll()
+        public List<Record> GetAll()
         {
             return context.Records.Include(r => r.Patient).Include(r => r.Doctor).ToList();
         }
 
-        Record IRepository<Record>.GetById(int id)
+        public Record GetById(int id)
         {
             return context.Records.Include(r => r.Patient).Include(r => r.Doctor)
                    .FirstOrDefault(r => r.Id == id);
         }
 
-        List<Record> IRepository<Record>.GetPage(int page)
+        public List<Record> GetPage(int page)
         {
             int pageSize = 5;
 
             return context.Records.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         }
 
-        int IRepository<Record>.GetTotalPages(int pageSize)
+        public int GetTotalPages(int pageSize)
         {
             return (int)Math.Ceiling((double)context.Records.Count() / pageSize);
         }
 
-        void IRepository<Record>.Insert(Record record)
+        public void Insert(Record record)
         {
             context.Records.Add(record);
         }
@@ -49,7 +49,7 @@ namespace Hospital_Management.Repository
             context.SaveChanges();
         }
 
-        List<Record> IRepository<Record>.Search(string searchString, string searchProperty)
+        public List<Record> Search(string searchString, string searchProperty)
         {
             switch (searchProperty)
             {
@@ -64,7 +64,7 @@ namespace Hospital_Management.Repository
             }
         }
 
-        void IRepository<Record>.Update(Record entity)
+        public void Update(Record entity)
         {
             context.Records.Update(entity);
         }

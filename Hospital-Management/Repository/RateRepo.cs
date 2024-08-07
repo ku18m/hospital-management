@@ -6,7 +6,7 @@ namespace Hospital_Management.Repository
 {
     public class RateRepo(ApplicationDbContext context) : IRateRepo
     {
-        void IRepository<Rate>.Delete(int id)
+        public void Delete(int id)
         {
             var rate = context.Rates.Find(id);
             if (rate != null)
@@ -15,40 +15,40 @@ namespace Hospital_Management.Repository
             }
         }
 
-        List<Rate> IRepository<Rate>.GetAll()
+        public List<Rate> GetAll()
         {
             return context.Rates.Include(r => r.Doctor).Include(r => r.Patient).ToList();
         }
 
-        Rate IRepository<Rate>.GetById(int id)
+        public Rate GetById(int id)
         {
             return context.Rates.Include(r => r.Doctor).Include(r => r.Patient)
                   .FirstOrDefault(r => r.Id == id);
         }
 
-        List<Rate> IRepository<Rate>.GetPage(int page)
+        public List<Rate> GetPage(int page)
         {
             int pageSize = 5;
 
             return context.Rates.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         }
 
-        int IRepository<Rate>.GetTotalPages(int pageSize)
+        public int GetTotalPages(int pageSize)
         {
             return (int)Math.Ceiling((double)context.Rates.Count() / pageSize);
         }
 
-        void IRepository<Rate>.Insert(Rate rate)
+        public void Insert(Rate rate)
         {
             context.Rates.Add(rate);
         }
 
-        void IRepository<Rate>.Save()
+        public void Save()
         {
             context.SaveChanges();
         }
 
-        List<Rate> IRepository<Rate>.Search(string searchString, string searchProperty)
+        public List<Rate>Search(string searchString, string searchProperty)
         {
             switch (searchProperty)
             {
@@ -61,7 +61,7 @@ namespace Hospital_Management.Repository
                     return context.Rates.Where(r => r.Patient.FullName.Contains(searchString)).ToList();
             }
         }
-        void IRepository<Rate>.Update(Rate entity)
+        public void Update(Rate entity)
         {
             context.Rates.Update(entity);
         }

@@ -6,45 +6,45 @@ namespace Hospital_Management.Repository
 {
     public class ArticleRepo(ApplicationDbContext context) : IArticleRepo
     {
-        void IRepository<Article>.Delete(int id)
+         public void Delete(int id)
         {
             throw new NotImplementedException();
         }
 
-        List<Article> IRepository<Article>.GetAll()
+        public List<Article> GetAll()
         {
             return context.Articles.Include(a => a.Doctor).ToList();
         }
 
-        Article IRepository<Article>.GetById(int id)
+        public Article GetById(int id)
         {
             return context.Articles.Include(a => a.Doctor)
                 .FirstOrDefault(a => a.Id == id);
         }
 
-        List<Article> IRepository<Article>.GetPage(int page)
+        public List<Article> GetPage(int page)
         {
             int pageSize = 5;
 
             return context.Articles.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         }
 
-        int IRepository<Article>.GetTotalPages(int pageSize)
+        public int GetTotalPages(int pageSize)
         {
             return (int)Math.Ceiling((double)context.Articles.Count() / pageSize);
         }
 
-        void IRepository<Article>.Insert(Article entity)
+        public void Insert(Article entity)
         {
             context.Articles.Add(entity);
         }
 
-        void IRepository<Article>.Save()
+        public void Save()
         {
             context.SaveChanges();
         }
 
-        List<Article> IRepository<Article>.Search(string searchString, string searchProperty)
+        public List<Article>Search(string searchString, string searchProperty)
         {
             switch (searchProperty)
             {
@@ -58,7 +58,7 @@ namespace Hospital_Management.Repository
             }
         }
 
-        void IRepository<Article>.Update(Article entity)
+        public void Update(Article entity)
         {
             context.Articles.Update(entity);
         }

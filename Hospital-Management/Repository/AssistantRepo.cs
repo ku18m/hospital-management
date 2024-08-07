@@ -7,7 +7,7 @@ namespace Hospital_Management.Repository
 {
     public class AssistantRepo(ApplicationDbContext context) : IAssistantRepo
     {
-        void IRepository<Assistant>.Delete(int id)
+        public void Delete(int id)
         {
             var assistant = context.Assistants.Find(id);
             if (assistant != null)
@@ -16,40 +16,40 @@ namespace Hospital_Management.Repository
             }
         }
 
-        List<Assistant> IRepository<Assistant>.GetAll()
+        public List<Assistant> GetAll()
         {
             return context.Assistants.Include(a => a.Doctor).ToList();
         }
 
-        Assistant IRepository<Assistant>.GetById(int id)
+        public Assistant GetById(int id)
         {
             return context.Assistants.Include(a => a.Doctor)
                 .FirstOrDefault(a => a.Id == id.ToString());
         }
 
-        List<Assistant> IRepository<Assistant>.GetPage(int page)
+        public List<Assistant> GetPage(int page)
         {
             int pageSize = 5;
 
             return context.Assistants.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         }
 
-        int IRepository<Assistant>.GetTotalPages(int pageSize)
+        public int GetTotalPages(int pageSize)
         {
             return (int)Math.Ceiling((double)context.Assistants.Count() / pageSize);
         }
 
-        void IRepository<Assistant>.Insert(Assistant entity)
+        public void Insert(Assistant entity)
         {
             context.Assistants.Add(entity);
         }
 
-        void IRepository<Assistant>.Save()
+        public void Save()
         {
             context.SaveChanges();
         }
 
-        List<Assistant> IRepository<Assistant>.Search(string searchString, string searchProperty)
+        public List<Assistant> Search(string searchString, string searchProperty)
         {
             switch (searchProperty)
             {
@@ -63,7 +63,7 @@ namespace Hospital_Management.Repository
             }
         }
 
-        void IRepository<Assistant>.Update(Assistant entity)
+        public void Update(Assistant entity)
         {
             context.Assistants.Update(entity);
         }
