@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hospital_Management.Areas.admin.Controllers
 {
+    [Area("AdminPortal")]
+    [Authorize(Policy = "RequireAdminRole")]
     public class HomeController : Controller
     {
-        [Area("AdminPortal")]
         public IActionResult Index()
         {
             return View();
