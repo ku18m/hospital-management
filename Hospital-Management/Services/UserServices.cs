@@ -3,23 +3,14 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Hospital_Management.Services
 {
-    public class UserServices<TUser> : IUserServices<TUser> where TUser : ApplicationUser
+    public class UserServices<TUser>(UserManager<TUser> userManager, SignInManager<TUser> signInManager) : IUserServices<TUser> where TUser : ApplicationUser
     {
-        private readonly UserManager<TUser> _userManager;
-        private readonly SignInManager<TUser> _signInManager;
-
-        public UserServices(UserManager<TUser> userManager, SignInManager<TUser> signInManager)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
-
         public async Task<bool> Register(TUser user, string password, string role = "Patient")
         {
-            var result = await _userManager.CreateAsync(user, password);
+            var result = await userManager.CreateAsync(user, password);
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, role);
+                await userManager.AddToRoleAsync(user, role);
             }
             return result.Succeeded;
         }
@@ -30,16 +21,16 @@ namespace Hospital_Management.Services
 
             if (usernameOrEmail.Contains("@"))
             {
-                user = await _userManager.FindByEmailAsync(usernameOrEmail);
+                user = await userManager.FindByEmailAsync(usernameOrEmail);
             }
             else
             {
-                user = await _userManager.FindByNameAsync(usernameOrEmail);
+                user = await userManager.FindByNameAsync(usernameOrEmail);
             }
 
             if (user != null)
             {
-                var result = await _signInManager.PasswordSignInAsync(user.UserName, password, false, false);
+                var result = await signInManager.PasswordSignInAsync(user.UserName, password, false, false);
                 return result.Succeeded;
             }
             return false;
@@ -47,32 +38,32 @@ namespace Hospital_Management.Services
 
         public async Task<bool> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await signInManager.SignOutAsync();
             return true;
         }
 
         public async Task<TUser> GetUserByIdAsync(string userId)
         {
-            return await _userManager.FindByIdAsync(userId);
+            return await userManager.FindByIdAsync(userId);
         }
 
         public async Task<TUser> GetUserByUsernameAsync(string username)
         {
-            return await _userManager.FindByNameAsync(username);
+            return await userManager.FindByNameAsync(username);
         }
 
         public async Task<bool> UpdateUserAsync(TUser user)
         {
-            var result = await _userManager.UpdateAsync(user);
+            var result = await userManager.UpdateAsync(user);
             return result.Succeeded;
         }
 
         public async Task<bool> DeleteUserAsync(string userId)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await userManager.FindByIdAsync(userId);
             if (user != null)
             {
-                var result = await _userManager.DeleteAsync(user);
+                var result = await userManager.DeleteAsync(user);
                 return result.Succeeded;
             }
             return false;
@@ -80,18 +71,18 @@ namespace Hospital_Management.Services
 
         public async Task<IList<string>> GetUserRolesAsync(TUser user)
         {
-            return await _userManager.GetRolesAsync(user);
+            return await userManager.GetRolesAsync(user);
         }
 
         public async Task<bool> AddUserToRoleAsync(TUser user, string role)
         {
-            var result = await _userManager.AddToRoleAsync(user, role);
+            var result = await userManager.AddToRoleAsync(user, role);
             return result.Succeeded;
         }
 
         public async Task<bool> RemoveUserFromRoleAsync(TUser user, string role)
         {
-            var result = await _userManager.RemoveFromRoleAsync(user, role);
+            var result = await userManager.RemoveFromRoleAsync(user, role);
             return result.Succeeded;
         }
     }
