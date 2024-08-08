@@ -8,7 +8,11 @@ namespace Hospital_Management.Repository
     {
          public void Delete(int id)
         {
-            throw new NotImplementedException();
+            var article = context.Articles.Find(id);
+            if (article != null)
+            {
+                context.Articles.Remove(article);
+            }
         }
 
         public List<Article> GetAll()
