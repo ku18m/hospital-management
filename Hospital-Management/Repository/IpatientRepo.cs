@@ -2,7 +2,7 @@
 
 namespace Hospital_Management.Repository
 {
-    public interface IpatientRepo : IRepository<Patient>
+    public interface IPatientRepo : IRepository<Patient>
 
     {
     }

@@ -56,9 +56,10 @@ namespace Hospital_Management.Repository
                     return context.Rates.Where(r => r.Value.ToString().Contains(searchString)).ToList();
                 case "Doctor":
                     return context.Rates.Where(r => r.Doctor.FullName.Contains(searchString)).ToList();
-
-                default:
+                case "Patient":
                     return context.Rates.Where(r => r.Patient.FullName.Contains(searchString)).ToList();
+                default:
+                    return context.Rates.Where(r => r.Comment.Contains(searchString)).ToList();
             }
         }
         public void Update(Rate entity)

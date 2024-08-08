@@ -3,7 +3,7 @@ using Hospital_Management.Models;
 using Microsoft.EntityFrameworkCore;
 namespace Hospital_Management.Repository
 {
-    public class PatientRepo(ApplicationDbContext context) : IpatientRepo
+    public class PatientRepo(ApplicationDbContext context) : IPatientRepo
     {
         public void Delete(int id)
         {
@@ -60,6 +60,29 @@ namespace Hospital_Management.Repository
                     return context.Patients.Where(p => p.FullName.Contains(searchString)).ToList();
                 case "FirstName":
                     return context.Patients.Where(p => p.FirstName.Contains(searchString)).ToList();
+                case "Email":
+                    return context.Patients.Where(p => p.Email.Contains(searchString)).ToList();
+                case "UserName":
+                    return context.Patients.Where(p => p.UserName.Contains(searchString)).ToList();
+                case "Address":
+                    return context.Patients.Where(p => p.Address.Contains(searchString)).ToList();
+                case "PhoneNumber":
+                    return context.Patients.Where(p => p.PhoneNumber.Contains(searchString)).ToList();
+                case "Age":
+                    int ageToSearch;
+                    if (int.TryParse(searchString, out ageToSearch))
+                    {
+                        var today = DateTime.Today;
+                        return context.Patients.Where(p =>
+                            (today.Year - p.BirthDate.Year -
+                            (p.BirthDate > today.AddYears(-(today.Year - p.BirthDate.Year)) ? 1 : 0)) == ageToSearch)
+                            .ToList();
+                    }
+                    else
+                    {
+                        return new List<Patient>(); 
+                    }
+
                 default:
                     return context.Patients.Where(p => p.LastName.Contains(searchString)).ToList();
                     

@@ -57,10 +57,12 @@ namespace Hospital_Management.Repository
                     return context.Records.Where(r => r.Description.Contains(searchString)).ToList();
                 case "Diagnosis":
                     return context.Records.Where(r => r.Diagnosis.Contains(searchString)).ToList();
-                case "Prescription":
-                    return context.Records.Where(r => r.Prescription.Contains(searchString)).ToList();
-                default: 
+                case "Doctor":
+                    return context.Records.Where(r => r.Doctor.FullName.Contains(searchString)).ToList();
+                case "Patient":
                     return context.Records.Where(r => r.Patient.FullName.Contains(searchString)).ToList();
+                default:
+                    return context.Records.Where(r => r.Prescription.Contains(searchString)).ToList();
             }
         }
 
