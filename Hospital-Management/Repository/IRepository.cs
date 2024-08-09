@@ -11,5 +11,6 @@
         public void Update(Entity entity);
         public void Delete(int id);
         public void Save();
+       
     }
 }
