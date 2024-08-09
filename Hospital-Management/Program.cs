@@ -1,5 +1,6 @@
 using Hospital_Management.Data;
 using Hospital_Management.Models;
+using Hospital_Management.Repository;
 using Hospital_Management.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -52,6 +53,19 @@ namespace Hospital_Management
             #region IoC for services
             // User services DI.
             builder.Services.AddScoped(typeof(IUserServices<>), typeof(UserServices<>));
+
+            // Repositories DI.
+            builder.Services.AddScoped<IArticleRepo, ArticleRepo>();
+            builder.Services.AddScoped<IDoctorRepo, DoctorRepo>();
+            builder.Services.AddScoped<IPatientRepo, PatientRepo>();
+            builder.Services.AddScoped<IAssistantRepo, AssistantRepo>();
+            builder.Services.AddScoped<IReservationRepo, ReservationRepo>();
+            builder.Services.AddScoped<IRateRepo, RateRepo>();
+            builder.Services.AddScoped<IRecordRepo, RecordRepo>();
+            builder.Services.AddScoped<ISpecialityRepo, SpecialityRepo>();
+
+            // Unit of work DI.
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             #endregion
 
             #region Authorization Policies
