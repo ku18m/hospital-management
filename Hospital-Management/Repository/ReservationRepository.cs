@@ -3,7 +3,7 @@ using Hospital_Management.Models;
 using Hospital_Management.Models.DataTypes;
 namespace Hospital_Management.Repository
 {
-    public class ReservationRepository(ApplicationDbContext context) : IRepository<Reservation>
+    public class ReservationRepo(ApplicationDbContext context) : IReservationRepo
     {
         public void Delete(int id)
         {
@@ -53,6 +53,8 @@ namespace Hospital_Management.Repository
                     ReservationStatus Status;
                     ReservationStatus.TryParse(searchString, out Status);
                     return context.Reservations.Where(res => res.ReservationStatus == Status).ToList();
+                case "Patient":
+                    return context.Reservations.Where(res => res.Patient.FullName.Contains(searchString)).ToList();
                 default: // Otherwise, search by name.
                     return context.Reservations.Where(res => res.Doctor.FullName.Contains(searchString)).ToList();
             }

@@ -4,7 +4,7 @@ using Hospital_Management.Models;
 
 namespace Hospital_Management.Repository
 {
-    public class SpecialityRepository(ApplicationDbContext context) : IRepository<Speciality>
+    public class SpecialityRepo(ApplicationDbContext context) : ISpecialityRepo
     {
         public void Delete(int id)
         {
