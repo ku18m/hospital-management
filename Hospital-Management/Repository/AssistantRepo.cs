@@ -58,6 +58,7 @@ namespace Hospital_Management.Repository
                 case "Doctor":
                     return context.Assistants.Where(a => a.Doctor.FullName.Contains(searchString)).ToList();
 
+
                 default:
                     return context.Assistants.Where(a => a.FirstName.Contains(searchString)).ToList();
             }
