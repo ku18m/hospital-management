@@ -33,4 +33,8 @@
     <Folder Include="Areas\DoctorPortal\Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="hazem\" />
+  </ItemGroup>
+
 </Project>
