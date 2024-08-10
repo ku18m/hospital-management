@@ -66,6 +66,9 @@ namespace Hospital_Management
 
             // Unit of work DI.
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Home services DI.
+            builder.Services.AddScoped<IHomeServices, HomeServices>();
             #endregion
 
             #region Authorization Policies
