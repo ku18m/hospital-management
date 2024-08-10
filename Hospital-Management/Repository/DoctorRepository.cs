@@ -6,7 +6,7 @@ namespace Hospital_Management.Repository
 {
     public class DoctorRepo(ApplicationDbContext context) : IDoctorRepo
     {
-        public void Delete(int id)
+        public void Delete(string id)
         {
             context.Doctors.Remove(context.Doctors.Find(id));
         }
@@ -16,7 +16,7 @@ namespace Hospital_Management.Repository
             return context.Doctors.ToList();
         }
 
-        public Doctor GetById(int id)
+        public Doctor GetById(string id)
         {
             return context.Doctors.Find(id);
         }
