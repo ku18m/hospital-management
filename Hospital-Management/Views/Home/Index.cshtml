@@ -119,7 +119,7 @@
                                                 @article.Title
                                             </h1>
                                             <p>
-                                                @article.Content
+                                                @(article.Content.Length > 100 ? $"{article.Content.Substring(0, 100)} ..." : article.Content)
                                             </p>
                                             <div class="btn-box">
                                                 <a href="/articles/@article.Id" class="btn1">
