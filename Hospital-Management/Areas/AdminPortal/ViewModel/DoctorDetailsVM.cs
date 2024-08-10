@@ -1,17 +1,15 @@
 ﻿using Hospital_Management.Models;
 using Hospital_Management.Models.DataTypes;
+using Hospital_Management.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hospital_Management.Areas.AdminPortal.ViewModel
 {
-    public class DoctorDetailsVM : Doctor
+    public class DoctorDetailsVM
     {
-        [Key]
-        [DisplayName("ID")]
-        public string DoctorId { get; set; }
-
+        public string? DoctorId {  get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         [DisplayName("Name")]
@@ -29,7 +27,7 @@ namespace Hospital_Management.Areas.AdminPortal.ViewModel
         public byte[]? Img { get; set; }
 
         //------------------- More Details ------------------------
-        public virtual List<SelectListItem> Reservations { get; set; }
+        public virtual List<Reservation> Reservations { get; set; }
 
         public virtual List<Assistant> Assistants { get; set; }
 

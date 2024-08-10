@@ -7,27 +7,29 @@
 
 <div class="container">
     <div class="d-flex">
-        <form action="/course/search" method="post">
+        <form action="/doctor/search" method="post">
             <div class="input-group me-auto">
                 <input class="form-control" type="search" name="searchString" placeholder="Search" />
                 <select class="form-select" name="SearchProperty">
-                    <option value="name">Name</option>
-                    <option value="hours">Hours</option>
-                    <option value="degree">Degree</option>
-                    <option value="minDegree">Minimum Degree</option>
+                    <option value="firstName">FirstName</option>
+                    <option value="lastName">LastName</option>
+                    <option value="workingDays">WorkingDays</option>
+                    <option value="workingHours">WorkingHours</option>
+                    <option value="speciality">Speciality</option>
+                    <option value="startHour">StartHour</option>
                 </select>
                 <button class="btn btn-success" type="submit"><i class="bi bi-search"></i></button>
             </div>
         </form>
         <button class="btn btn-success ms-auto mb-1">
-            <a class="text-white" style="text-decoration:none" href="/course/Add">New</a>
+            <a class="text-white" style="text-decoration:none" href="/doctor/Add">New</a>
         </button>
     </div>
     <table class="table table-bordered table-hover text-center align-middle">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
+                <th>FullName</th>
                 <th>Hours</th>
                 <th>Degree</th>
                 <th>Minimum Degree</th>

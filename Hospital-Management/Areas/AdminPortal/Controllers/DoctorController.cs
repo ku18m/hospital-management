@@ -1,6 +1,7 @@
 ﻿using Hospital_Management.Areas.AdminPortal.ViewModel;
 using Hospital_Management.Models;
 using Hospital_Management.Repository;
+using Hospital_Management.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,7 +11,7 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
 {
     [Area("AdminPortal")]
     [Authorize(Policy = "RequireAdminRole")]
-    public class DoctorController(IWebHostEnvironment webHostEnvironment, IDoctorRepo DoctorRepo, IReservationRepo ReservationRepo, ISpecialityRepo SpecialityRepo) : Controller
+    public class DoctorController(IUserServices<ApplicationUser> userServices ,IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment) : Controller
     {
         //private readonly object webHostEnv;
 
@@ -20,8 +21,8 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
             var doctorsVM = new PaginationVM<Doctor>()
             {
                 CurrentPage = page,
-                TotalPages = DoctorRepo.GetTotalPages(pageSize),
-                Items = DoctorRepo.GetPage(page)
+                TotalPages = unitOfWork.DoctorRepository.GetTotalPages(pageSize),
+                Items = unitOfWork.DoctorRepository.GetPage(page)
             };
             return View("Index", doctorsVM);
         }
@@ -29,14 +30,14 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
         [HttpPost]
         public IActionResult Search(SearchVM<Doctor> searchVM)
         {
-            searchVM.Items = DoctorRepo.Search(searchVM.SearchString, searchVM.SearchProperty);
+            searchVM.Items = unitOfWork.DoctorRepository.Search(searchVM.SearchString, searchVM.SearchProperty);
             return View("Search", searchVM); 
         }
 
         public IActionResult Details(int id)
         {
-            //create BindGetDoctorDetails
-            Doctor doctorModel = DoctorRepo.GetById(id);
+            //create BindGetDoctorDetails DoctorDetailsVM doctorVM = unitOfWork.DoctorRepository.BindGetDoctorDetails(id);
+            Doctor doctorModel = unitOfWork.DoctorRepository.GetById(id);
 
             return View("Details", doctorModel);
         }
@@ -50,13 +51,7 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
             //addDoctorVM.Specialities = SpecialityRepo.GetAll();
             var addDoctorVM = new DoctorDetailsVM()
             {
-                Reservations = SpecialityRepo.GetAll().Select(res => new SelectListItem
-                {
-                    Value = res.Id.ToString(),
-                    Text = res.Name,
-                }).ToList(),
-
-                Specialities = SpecialityRepo.GetAll().Select(spec => new SelectListItem
+                Specialities = unitOfWork.SpecialityRepository.GetAll().Select(spec => new SelectListItem
                 {
                     Value = spec.Id.ToString(),
                     Text = spec.Name,
@@ -66,41 +61,124 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(DoctorDetailsVM newDoctorFromReq, IFormFile imgFile)
+        public async Task<IActionResult> SaveAdd(DoctorWithSpecialityVM doctorVMFromReq, IFormFile imgFile)
         {
             if (!ModelState.IsValid)
             {
-                newDoctorFromReq.Reservations = SpecialityRepo.GetAll().Select(res => new SelectListItem
-                {
-                    Value = res.Id.ToString(),
-                    Text = res.Name,
-                }).ToList();
-
-                newDoctorFromReq.Specialities = SpecialityRepo.GetAll().Select(spec => new SelectListItem
+                doctorVMFromReq.Specialities = unitOfWork.SpecialityRepository.GetAll().Select(spec => new SelectListItem
                 {
                     Value = spec.Id.ToString(),
                     Text = spec.Name,
                 }).ToList(); ;
                 
-                return View("Add", newDoctorFromReq);
+                return View("Add", doctorVMFromReq);
             }
 
             var doctor = new Doctor()
             {
-                FirstName = newDoctorFromReq.FirstName,
-                LastName = newDoctorFromReq.LastName,
-                SpecialityId = newDoctorFromReq.SpecialityId,
+                FirstName = doctorVMFromReq.FirstName,
+                LastName = doctorVMFromReq.LastName,
+                BirthDate = doctorVMFromReq.BirthDate,
+                Address = doctorVMFromReq.Address,
+                SpecialityId = doctorVMFromReq.SpecialityId,
                 Img = await UploadImage(imgFile),
             };
 
-            DoctorRepo.Insert(doctor);
+           
+                unitOfWork.DoctorRepository.Insert(doctor);
+                unitOfWork.DoctorRepository.Save();
+                ///////////////
+           
+            return RedirectToAction("Index");///////////////
+        }
 
-            DoctorRepo.Save();
+        //Doctor/Edit/Id=1
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            //var user = await userServices.GetUserByUsernameAsync(User.Identity.Name);
+            //var userById = await userServices.GetUserByIdAsync(user.Id);
+            var doctorByIdFromRepo = unitOfWork.DoctorRepository.GetById(id);
+
+            var editDoctorVM = new DoctorWithSpecialityVM()
+            {
+                DoctorId = doctorByIdFromRepo.Id,
+                FirstName = doctorByIdFromRepo.FirstName, 
+                LastName = doctorByIdFromRepo.LastName,
+                BirthDate = doctorByIdFromRepo.BirthDate,
+                Address = doctorByIdFromRepo.Address,
+                Img = doctorByIdFromRepo.Img,
+                SpecialityId = doctorByIdFromRepo.SpecialityId,
+                
+                Specialities = unitOfWork.SpecialityRepository.GetAll().Select(dept => new SelectListItem
+                {
+                    Value = dept.Id.ToString(),
+                    Text = dept.Name
+                }).ToList()
+            };
+
+            return View("Edit", editDoctorVM);
+        }
+        
+        //doctor/saveEdit/object request
+        [HttpPost]
+        public IActionResult SaveEdit(DoctorWithSpecialityVM editDocVMFromReq)
+        {
+            if (!ModelState.IsValid)
+            {
+                editDocVMFromReq.Specialities = unitOfWork.SpecialityRepository.GetAll().Select(spec => new SelectListItem
+                {
+                    Value = spec.Id.ToString(),
+                    Text = spec.Name
+                }).ToList();
+
+                return View("Edit", editDocVMFromReq);
+            }
+
+
+            Doctor doctor = new()
+            {
+                Id = editDocVMFromReq.DoctorId,
+                FirstName = editDocVMFromReq.FirstName,
+                LastName = editDocVMFromReq.LastName,
+                BirthDate = editDocVMFromReq.BirthDate,
+                Address = editDocVMFromReq.Address,
+                Img = editDocVMFromReq.Img,
+                SpecialityId = editDocVMFromReq.SpecialityId,
+            };
+
+
+            unitOfWork.DoctorRepository.Update(doctor);
+
+            unitOfWork.DoctorRepository.Save();
 
             return RedirectToAction("Index");
         }
 
-        private async Task<string> UploadImage(IFormFile imgFile)
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var doctor = unitOfWork.DoctorRepository.GetById(id);
+                if (doctor == null)
+                {
+                    return StatusCode(404, new { message = "Course not found." });
+                }
+
+                unitOfWork.DoctorRepository.Delete(id);
+
+                unitOfWork.DoctorRepository.Save();
+
+                return StatusCode(201, new { message = "Course successfully removed." });
+            }
+            catch
+            {
+                return StatusCode(500, $"An error occured while removing the Course.");
+            }
+        }
+
+        private async Task<byte[]> UploadImage(IFormFile imgFile)
         {
             string imgPath;
 
@@ -112,18 +190,44 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
 
                 try
                 {
-                    using (var fileStream = new FileStream(imgPath, FileMode.Create))
+                    //using (var fileStream = new FileStream(imgPath, FileMode.Create))
+                    //{
+                    //    await imgFile.CopyToAsync(fileStream);
+                    //}
+                    //return $"/Images/{fileName}";
+                    using (var memoryStream = new MemoryStream())
                     {
-                        await imgFile.CopyToAsync(fileStream);
+                        await imgFile.CopyToAsync(memoryStream);
+                        return memoryStream.ToArray(); // Return the byte array
                     }
-                    return $"/Images/{fileName}";
                 }
                 catch
                 {
-                    return "";
+                    return null;
                 }
             }
-            return "";
+            return null;
+        }
+
+        private bool RemoveImage(string imgPath)
+        {
+            bool status = false;
+
+            if (imgPath != null)
+            {
+                try
+                {
+                    var fullPath = Path.Combine(webHostEnvironment.WebRootPath, "Images", imgPath.Split("/")[^1]);
+                    System.IO.File.Delete(fullPath);
+                    status = true;
+                }
+                catch
+                {
+                    status = false;
+                }
+            }
+
+            return status;
         }
 
 
