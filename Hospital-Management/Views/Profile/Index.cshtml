@@ -1,4 +1,4 @@
-﻿@model UserProfileData
+﻿@model UserProfileDataViewModel
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_CustomLayout.cshtml";
@@ -7,7 +7,7 @@
 <h2>User Profile</h2>
 
 <div class="profile-container">
-    <form id="profileForm" asp-action="SaveChangesAsync" asp-controller="Profile" method="post" enctype="multipart/form-data">
+    <form id="profileForm" asp-action="SaveChanges" asp-controller="Profile" method="post" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <div class="grid-container">
             <div class="grid-item">
@@ -26,8 +26,7 @@
             <div class="grid-item">
                 <label><strong>Username:</strong></label>
                 <input type="text" id="UserName" value="@Model.UserName" asp-for="UserName" disabled />
-                <label><strong>UserId:</strong></label>
-                <input type="text" id="UserId" value="@Model.UserId" asp-for="UserId" disabled />
+             
             </div>
             <div class="grid-item">
                 <label><strong>Email:</strong></label>

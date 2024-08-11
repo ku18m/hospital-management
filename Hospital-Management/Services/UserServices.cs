@@ -85,6 +85,10 @@ namespace Hospital_Management.Services
             var result = await userManager.RemoveFromRoleAsync(user, role);
             return result.Succeeded;
         }
+        public async Task<TUser> GetUserByEmail(string email)
+        {
+            return await userManager.FindByEmailAsync(email);
+        }
     }
 
 }

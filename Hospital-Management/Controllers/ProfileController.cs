@@ -1,4 +1,5 @@
 ﻿using Hospital_Management.Models;
+using Hospital_Management.Repository;
 using Hospital_Management.Services;
 using Hospital_Management.ViewModels;
 using Microsoft.AspNetCore.Authentication;
@@ -9,30 +10,51 @@ using System.Security.Claims;
 
 namespace Hospital_Management.Controllers
 {
-    public class ProfileController(IUserServices<ApplicationUser> services) : Controller
+    public class ProfileController(IUserServices<ApplicationUser> services,IUnitOfWork unit) : Controller
     {
 
-      
-        public IActionResult Index()
+        public async Task<IActionResult> VerifyUserName(string userName)
         {
-                var model = new UserProfileData
-                {
-                    UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
-                    UserName = User.Identity.Name,
-                    Email = User.FindFirst(ClaimTypes.Email)?.Value,
-                    FirstName = User.FindFirst(ClaimTypes.GivenName)?.Value,
-                    LastName = User.FindFirst(ClaimTypes.Surname)?.Value,
-                    BirthDate = User.FindFirst(ClaimTypes.DateOfBirth)?.Value,
-                };
+            var testUser = await services.GetUserByUsernameAsync(userName);
+            if (testUser != null)
+            {
+                return Json($"Email {userName} is already in use.");
+            }
+            return Json(true);
+        }
+        public async Task<IActionResult> VerifyUser(UserProfileDataViewModel model)
+        {
+            
+            var existingUser = await services.GetUserByEmail(model.Email);
+            if (existingUser != null && existingUser.Id != model.UserId)
+            {
+                return Json($"Username or Email is already in use.");
+            }
+            return Json(true);
+        }
+        public async Task<IActionResult> Index()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await services.GetUserByIdAsync(userId);
+            var model = new UserProfileDataViewModel
+            {
+                UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+                UserName = User.Identity.Name,
+                Email = User.FindFirst(ClaimTypes.Email)?.Value,
+                FirstName = User.FindFirst(ClaimTypes.GivenName)?.Value,
+                LastName = User.FindFirst(ClaimTypes.Surname)?.Value,
+                BirthDate = User.FindFirst(ClaimTypes.DateOfBirth)?.Value,
+                Img = user.Img
+            };
             return View(model);
            
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveChangesAsync(UserProfileData model, IFormFile Img)
+        public async Task<IActionResult> SaveChanges(UserProfileDataViewModel model, IFormFile Img)
         { 
-            var Patient=await services.GetUserByIdAsync(model.UserId);
-            if (ModelState.IsValid&& Patient != null)
+            var user=await services.GetUserByIdAsync(model.UserId);
+            if (ModelState.IsValid&& user != null)
             {
                 
                 if (Img != null && Img.Length > 0)
@@ -40,7 +62,8 @@ namespace Hospital_Management.Controllers
                     using (var memoryStream = new MemoryStream())
                     {
                         await Img.CopyToAsync(memoryStream);
-                        Patient.Img = memoryStream.ToArray();
+                        user.Img = memoryStream.ToArray();
+                        model.Img = memoryStream.ToArray();
                    
                     }
                   
@@ -48,19 +71,17 @@ namespace Hospital_Management.Controllers
 
             }
            
-            if (Patient != null) 
+            if (user != null) 
             {
-                Patient.Email =model.Email;
-                Patient.FirstName = model.FirstName;
-                Patient.LastName = model.LastName;
-                Patient.BirthDate = DateTime.Parse(model.BirthDate);
+                user.Email =model.Email;
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.BirthDate = DateTime.Parse(model.BirthDate);
               
-                var result = await services.UpdateUserAsync(Patient);
-                if (result)
+                var result = unit.Save();
+                if (result!=0)
                 {
                     var claimsIdentity = (ClaimsIdentity)User.Identity;
-
-                    
                     UpdateClaim(claimsIdentity, ClaimTypes.Email, model.Email);
                     UpdateClaim(claimsIdentity, ClaimTypes.GivenName, model.FirstName);
                     UpdateClaim(claimsIdentity, ClaimTypes.Surname, model.LastName);
@@ -77,7 +98,7 @@ namespace Hospital_Management.Controllers
                    new ClaimsPrincipal(claimsIdentity));
 
 
-                    return RedirectToAction("Index","Profile"); 
+                    return RedirectToAction("index","profile"); 
                 }
                 else
                 {
@@ -98,7 +119,7 @@ namespace Hospital_Management.Controllers
             var existingClaim = identity.FindFirst(claimType);
             if (existingClaim != null)
             {
-              
+      
                 identity.RemoveClaim(existingClaim);
             }
             
