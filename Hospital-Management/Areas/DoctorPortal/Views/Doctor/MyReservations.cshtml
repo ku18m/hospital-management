@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Hospital_Management.ViewModels.ReservationViewModel>
+
+@{
+    ViewData["Title"] = "My Reservations";
+}
+
+<h1>My Reservations</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reservation in Model)
+        {
+            <tr>
+                <td>@reservation.PatientName</td>
+                <td>@reservation.Date.ToString("g")</td>
+                <td>@reservation.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
