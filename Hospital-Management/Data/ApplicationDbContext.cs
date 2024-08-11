@@ -85,11 +85,15 @@ namespace Hospital_Management.Data
 
             #region Data Seed.
             // Seed Roles
+            var adminRoleId = Guid.NewGuid().ToString();
+            var doctorRoleId = Guid.NewGuid().ToString();
+            var assistantRoleId = Guid.NewGuid().ToString();
+            var patientRoleId = Guid.NewGuid().ToString();
             builder.Entity<IdentityRole>().HasData(
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Admin", NormalizedName = "ADMIN" },
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Doctor", NormalizedName = "DOCTOR" },
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Assistant", NormalizedName = "ASSISTANT" },
-                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Patient", NormalizedName = "PATIENT" }
+                new IdentityRole { Id = adminRoleId, Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Id = doctorRoleId, Name = "Doctor", NormalizedName = "DOCTOR" },
+                new IdentityRole { Id = assistantRoleId, Name = "Assistant", NormalizedName = "ASSISTANT" },
+                new IdentityRole { Id = patientRoleId, Name = "Patient", NormalizedName = "PATIENT" }
             );
 
             // Seed Admin Users
@@ -133,8 +137,17 @@ namespace Hospital_Management.Data
 
             // Assign Roles to Admin Users
             builder.Entity<IdentityUserRole<string>>().HasData(
-                new IdentityUserRole<string> { RoleId = "ADMIN", UserId = admin1Id },
-                new IdentityUserRole<string> { RoleId = "ADMIN", UserId = admin2Id }
+                new IdentityUserRole<string> { RoleId = adminRoleId, UserId = admin1Id },
+                new IdentityUserRole<string> { RoleId = adminRoleId, UserId = admin2Id }
+            );
+
+            // Seed Specialities
+            builder.Entity<Speciality>().HasData(
+                new Speciality { Id = 1, Name = "Cardiology" },
+                new Speciality { Id = 2, Name = "Diagnosis" },
+                new Speciality { Id = 3, Name = "Surgery" },
+                new Speciality { Id = 4, Name = "First Aid" },
+                new Speciality { Id = 5, Name = "Orthopedics" }
             );
 
             // Seed Doctors
@@ -249,11 +262,11 @@ namespace Hospital_Management.Data
 
             // Assign Roles to Doctors
             builder.Entity<IdentityUserRole<string>>().HasData(
-                new IdentityUserRole<string> { RoleId = "DOCTOR", UserId = doctor1Id },
-                new IdentityUserRole<string> { RoleId = "DOCTOR", UserId = doctor2Id },
-                new IdentityUserRole<string> { RoleId = "DOCTOR", UserId = doctor3Id },
-                new IdentityUserRole<string> { RoleId = "DOCTOR", UserId = doctor4Id },
-                new IdentityUserRole<string> { RoleId = "DOCTOR", UserId = doctor5Id }
+                new IdentityUserRole<string> { RoleId = doctorRoleId, UserId = doctor1Id },
+                new IdentityUserRole<string> { RoleId = doctorRoleId, UserId = doctor2Id },
+                new IdentityUserRole<string> { RoleId = doctorRoleId, UserId = doctor3Id },
+                new IdentityUserRole<string> { RoleId = doctorRoleId, UserId = doctor4Id },
+                new IdentityUserRole<string> { RoleId = doctorRoleId, UserId = doctor5Id }
             );
 
             // Seed Assistants
@@ -343,11 +356,11 @@ namespace Hospital_Management.Data
 
             // Assign Roles to Assistants
             builder.Entity<IdentityUserRole<string>>().HasData(
-                new IdentityUserRole<string> { RoleId = "ASSISTANT", UserId = assistant1Id },
-                new IdentityUserRole<string> { RoleId = "ASSISTANT", UserId = assistant2Id },
-                new IdentityUserRole<string> { RoleId = "ASSISTANT", UserId = assistant3Id },
-                new IdentityUserRole<string> { RoleId = "ASSISTANT", UserId = assistant4Id },
-                new IdentityUserRole<string> { RoleId = "ASSISTANT", UserId = assistant5Id }
+                new IdentityUserRole<string> { RoleId = assistantRoleId, UserId = assistant1Id },
+                new IdentityUserRole<string> { RoleId = assistantRoleId, UserId = assistant2Id },
+                new IdentityUserRole<string> { RoleId = assistantRoleId, UserId = assistant3Id },
+                new IdentityUserRole<string> { RoleId = assistantRoleId, UserId = assistant4Id },
+                new IdentityUserRole<string> { RoleId = assistantRoleId, UserId = assistant5Id }
             );
 
             // Seed Patients
@@ -432,11 +445,11 @@ namespace Hospital_Management.Data
 
             // Assign Roles to Patients
             builder.Entity<IdentityUserRole<string>>().HasData(
-                new IdentityUserRole<string> { RoleId = "PATIENT", UserId = patient1Id },
-                new IdentityUserRole<string> { RoleId = "PATIENT", UserId = patient2Id },
-                new IdentityUserRole<string> { RoleId = "PATIENT", UserId = patient3Id },
-                new IdentityUserRole<string> { RoleId = "PATIENT", UserId = patient4Id },
-                new IdentityUserRole<string> { RoleId = "PATIENT", UserId = patient5Id }
+                new IdentityUserRole<string> { RoleId = patientRoleId, UserId = patient1Id },
+                new IdentityUserRole<string> { RoleId = patientRoleId, UserId = patient2Id },
+                new IdentityUserRole<string> { RoleId = patientRoleId, UserId = patient3Id },
+                new IdentityUserRole<string> { RoleId = patientRoleId, UserId = patient4Id },
+                new IdentityUserRole<string> { RoleId = patientRoleId, UserId = patient5Id }
             );
 
             // Seed Articles
@@ -473,8 +486,8 @@ namespace Hospital_Management.Data
                     PatientId = patient4Id,
                     DoctorId = doctor4Id
                 },
-                new Record 
-                { 
+                new Record
+                {
                     Id = 5,
                     Description = "Consultation for chronic back pain",
                     Diagnosis = "Chronic lower back pain",
@@ -485,15 +498,6 @@ namespace Hospital_Management.Data
                     DoctorId = doctor5Id
                 }
                );
-
-            // Seed Specialities
-            builder.Entity<Speciality>().HasData(
-                new Speciality { Id = 1, Name = "Cardiology" },
-                new Speciality { Id = 2, Name = "Diagnosis" },
-                new Speciality { Id = 3, Name = "Surgery" },
-                new Speciality { Id = 4, Name = "First Aid" },
-                new Speciality { Id = 5, Name = "Orthopedics" }
-            );
 
             // Seed Reservations
             builder.Entity<Reservation>().HasData(
