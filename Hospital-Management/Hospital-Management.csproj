@@ -27,7 +27,6 @@
   <ItemGroup>
     <Folder Include="Areas\AdminPortal\Data\" />
     <Folder Include="Areas\AdminPortal\Models\" />
-    <Folder Include="Areas\AdminPortal\Repository\" />
     <Folder Include="Areas\AssistantPortal\Data\" />
     <Folder Include="Areas\AssistantPortal\Models\" />
     <Folder Include="Areas\DoctorPortal\Data\" />

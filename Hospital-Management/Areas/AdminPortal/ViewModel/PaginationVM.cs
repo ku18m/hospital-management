@@ -1,4 +1,5 @@
-﻿namespace Hospital_Management.Areas.AdminPortal.ViewModel
+﻿
+namespace Hospital_Management.Areas.AdminPortal.ViewModel
 {
     public class PaginationVM<Type>
     {
@@ -7,5 +8,10 @@
         public bool HasNextPage => CurrentPage < TotalPages;
         public bool HasPreviousPage => CurrentPage > 1;
         public List<Type> Items { get; set; }
+
+        public static implicit operator PaginationVM<Type>(PaginationVM<DoctorDetailsVM> v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

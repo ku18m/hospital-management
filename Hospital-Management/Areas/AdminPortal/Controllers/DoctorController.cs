@@ -15,17 +15,48 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
     {
         //private readonly object webHostEnv;
 
-        public IActionResult Index(int page=1)
+        //public IActionResult Index(int page=1)
+        //{
+        //    int pageSize = 10;
+
+        //    var doctorsVM = new PaginationVM<DoctorWithSpecialityVM>()
+        //    {
+        //        CurrentPage = page,
+        //        TotalPages = unitOfWork.DoctorRepository.GetTotalPages(pageSize),
+        //        Items = unitOfWork.DoctorRepository.GetPage(page)
+        //    };
+        //    return View("Index", doctorsVM);
+        //}
+
+        public IActionResult Index(int page = 1)
         {
             int pageSize = 10;
-            var doctorsVM = new PaginationVM<Doctor>()
+
+            var doctors = unitOfWork.DoctorRepository.GetPage(page);
+            //var spec = unitOfWork.SpecialityRepository.GetAll();
+            
+            var doctorVMs = doctors.Select(doctor => new DoctorWithSpecialityVM
+            {
+                DoctorId = doctor.Id,
+                FirstName = doctor.FirstName + " " + doctor.LastName,
+                SpecialityId = doctor.SpecialityId, // Assuming Doctor entity has a navigation property to Speciality
+                
+                BirthDate = doctor.BirthDate,
+                Address = doctor.Address,
+                
+            }).ToList();
+
+            // Create a PaginationVM<DoctorWithSpecialityVM> instance
+            var paginationVM = new PaginationVM<DoctorWithSpecialityVM>()
             {
                 CurrentPage = page,
                 TotalPages = unitOfWork.DoctorRepository.GetTotalPages(pageSize),
-                Items = unitOfWork.DoctorRepository.GetPage(page)
+                Items = doctorVMs
             };
-            return View("Index", doctorsVM);
+
+            return View("Index", paginationVM);
         }
+
 
         [HttpPost]
         public IActionResult Search(SearchVM<Doctor> searchVM)
@@ -34,11 +65,13 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
             return View("Search", searchVM); 
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Details(string id)
         {
             //create BindGetDoctorDetails DoctorDetailsVM doctorVM = unitOfWork.DoctorRepository.BindGetDoctorDetails(id);
-            Doctor doctorModel = unitOfWork.DoctorRepository.GetById(id);
+            // CourseDetailsVM courseVM = CourseRepo.BindGetCourseDetails(id);
 
+            Doctor doctorModel = unitOfWork.DoctorRepository.GetById(id);
+            if (doctorModel == null) return NotFound();
             return View("Details", doctorModel);
         }
 
@@ -94,7 +127,7 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
 
         //Doctor/Edit/Id=1
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(string id)
         {
             //var user = await userServices.GetUserByUsernameAsync(User.Identity.Name);
             //var userById = await userServices.GetUserByIdAsync(user.Id);
@@ -156,7 +189,7 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
         }
 
         [HttpDelete]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(string id)
         {
             try
             {

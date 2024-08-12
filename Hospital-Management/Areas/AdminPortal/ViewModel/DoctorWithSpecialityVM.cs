@@ -6,7 +6,7 @@ namespace Hospital_Management.Areas.AdminPortal.ViewModel
 {
     public class DoctorWithSpecialityVM
     {
-        public string? DoctorId { get; set; }
+        public string DoctorId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         [DisplayName("Name")]
@@ -15,7 +15,7 @@ namespace Hospital_Management.Areas.AdminPortal.ViewModel
         public int SpecialityId { get; set; }
         public virtual List<SelectListItem> Specialities { get; set; }
 
-        public virtual Speciality Speciality { get; set; }
+        public virtual Speciality? Speciality { get; set; }
 
         public DateTime BirthDate { get; set; }
 
