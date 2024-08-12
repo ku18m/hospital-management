@@ -66,6 +66,9 @@ namespace Hospital_Management
 
             // Unit of work DI.
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Home services DI.
+            builder.Services.AddScoped<IHomeServices, HomeServices>();
             #endregion
 
             #region Authorization Policies
@@ -111,22 +114,6 @@ namespace Hospital_Management
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.MapRazorPages();
-
-
-            // Call DataSeeder.
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    await DataSeeder.SeedData(services);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
-                }
-            }
 
             app.Run();
         }
