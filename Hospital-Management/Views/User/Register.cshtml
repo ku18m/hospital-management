@@ -7,7 +7,7 @@
 
 <h1>Register</h1>
 
-<h4>RegisterationViewModel</h4>
+<h4>Already Have Account? <button class="btn btn-success" onclick="window.location.href='/user/login'">Login</button></h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -54,14 +54,14 @@
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Register" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="PasswordReset">Not Sure?</a>
 </div>
 
 @section Scripts {

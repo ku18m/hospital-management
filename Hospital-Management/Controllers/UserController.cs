@@ -19,6 +19,8 @@ namespace Hospital_Management.Controllers
         [HttpGet]
         public async Task<IActionResult> Register()
         {
+            if(User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
+
             var model = new RegisterationViewModel();
 
             return View("Register", model);
@@ -45,6 +47,7 @@ namespace Hospital_Management.Controllers
 
                 if (result)
                 {
+                    await Login(new LoginViewModel { UsernameOrEmail = user.UserName, Password = model.Password, RememberMe = true });
                     return RedirectToAction("Index", "Home");
                 }
             }
@@ -54,6 +57,8 @@ namespace Hospital_Management.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity.IsAuthenticated) return RedirectToAction("Index", "Home");
+
             return View("Login");
         }
 
