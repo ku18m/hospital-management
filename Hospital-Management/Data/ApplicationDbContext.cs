@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
+using Hospital_Management.ViewModels;
 
 namespace Hospital_Management.Data
 {
@@ -510,5 +511,6 @@ namespace Hospital_Management.Data
 
             #endregion
         }
+        public DbSet<Hospital_Management.ViewModels.ArticleViewModel> ArticleViewModel { get; set; } = default!;
     }
 }
