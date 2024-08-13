@@ -18,7 +18,7 @@ namespace Hospital_Management.Services
                         Id = d.Id,
                         Name = d.FullName,
                         Img = d.Img,
-                        SpecialityId = d.SpecialityId,
+                        SpecialityName = d.Speciality.Name,
                         AvgRating = d.Rates.Count == 0 ? 0 : (int)d.Rates.Average(r => r.Value)
                     }).ToList()
                 }).FirstOrDefaultAsync();

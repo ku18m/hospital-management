@@ -9,6 +9,8 @@ namespace Hospital_Management.Services
         public async Task<PaginationViewModel<ArticleViewModel>> GetArticles(int page, int pageSize)
         {
             var articles = await context.Articles
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Include(a => a.Doctor)
                 .Select(a => new ArticleViewModel
                 {
@@ -18,8 +20,6 @@ namespace Hospital_Management.Services
                     DoctorName = a.Doctor.FullName,
                     DoctorId = a.Doctor.Id
                 })
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
                 .ToListAsync();
 
             var count = await context.Articles.CountAsync();
@@ -39,6 +39,8 @@ namespace Hospital_Management.Services
                 .Where(a => a.Content.Contains(searchString) || a.Title.Contains(searchString) || a.Doctor.FirstName.Contains(searchString) || a.Doctor.LastName.Contains(searchString));
 
             var articles = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(a => new ArticleViewModel
                 {
                     Id = a.Id,
@@ -47,8 +49,6 @@ namespace Hospital_Management.Services
                     DoctorName = a.Doctor.FullName,
                     DoctorId = a.Doctor.Id
                 })
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
                 .ToListAsync();
 
             var count = await query.CountAsync();
