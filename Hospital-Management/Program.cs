@@ -78,6 +78,9 @@ namespace Hospital_Management
 
             // Doctor services DI.
             builder.Services.AddScoped<IDoctorServices, DoctorServices>();
+
+            // Reservation services DI.
+            builder.Services.AddScoped<IReservationServices, ReservationServices>();
             #endregion
 
             #region Authorization Policies
