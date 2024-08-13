@@ -72,6 +72,9 @@ namespace Hospital_Management
 
             // Article services DI.
             builder.Services.AddScoped<IArticleServices, ArticleServices>();
+
+            // Speciality services DI.
+            builder.Services.AddScoped<ISpecialityServices, SpecialityServices>();
             #endregion
 
             #region Authorization Policies
