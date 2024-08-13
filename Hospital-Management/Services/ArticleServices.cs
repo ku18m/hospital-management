@@ -34,9 +34,11 @@ namespace Hospital_Management.Services
 
         public async Task<PaginationViewModel<ArticleViewModel>> Search(int page, int pageSize, string searchString, string? searchProperty = null)
         {
-            var articles = await context.Articles
+            var query = context.Articles
                 .Include(a => a.Doctor)
-                .Where(a => a.Content.Contains(searchString) || a.Title.Contains(searchString) || a.Doctor.FirstName.Contains(searchString) || a.Doctor.LastName.Contains(searchString))
+                .Where(a => a.Content.Contains(searchString) || a.Title.Contains(searchString) || a.Doctor.FirstName.Contains(searchString) || a.Doctor.LastName.Contains(searchString));
+
+            var articles = await query
                 .Select(a => new ArticleViewModel
                 {
                     Id = a.Id,
@@ -49,7 +51,7 @@ namespace Hospital_Management.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            var count = await context.Articles.Where(a => a.Content.Contains(searchString) || a.Title.Contains(searchString) || a.Doctor.FirstName.Contains(searchString) || a.Doctor.LastName.Contains(searchString)).CountAsync();
+            var count = await query.CountAsync();
 
             return new PaginationViewModel<ArticleViewModel>
             {
