@@ -13,29 +13,12 @@ namespace Hospital_Management.Controllers
     public class ProfileController(IUserServices<ApplicationUser> services,IUnitOfWork unit) : Controller
     {
 
-        public async Task<IActionResult> VerifyUserName(string userName)
-        {
-            var testUser = await services.GetUserByUsernameAsync(userName);
-            if (testUser != null)
-            {
-                return Json($"Email {userName} is already in use.");
-            }
-            return Json(true);
-        }
-        public async Task<IActionResult> VerifyUser(UserProfileDataViewModel model)
-        {
-            
-            var existingUser = await services.GetUserByEmail(model.Email);
-            if (existingUser != null && existingUser.Id != model.UserId)
-            {
-                return Json($"Username or Email is already in use.");
-            }
-            return Json(true);
-        }
+       
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var user = await services.GetUserByIdAsync(userId);
+           
             var model = new UserProfileDataViewModel
             {
                 UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
@@ -46,15 +29,18 @@ namespace Hospital_Management.Controllers
                 BirthDate = User.FindFirst(ClaimTypes.DateOfBirth)?.Value,
                 Img = user.Img
             };
+            if (User.IsInRole("patient"))
+            {
+                model.PatientRecord = unit.RecordRepository.GetById(model.UserId);
+            }
             return View(model);
            
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveChanges(UserProfileDataViewModel model, IFormFile Img)
         { 
-            var user=await services.GetUserByIdAsync(model.UserId);
-            if (ModelState.IsValid&& user != null)
+            
+            if (ModelState.IsValid)
             {
                 
                 if (Img != null && Img.Length > 0)
@@ -62,7 +48,7 @@ namespace Hospital_Management.Controllers
                     using (var memoryStream = new MemoryStream())
                     {
                         await Img.CopyToAsync(memoryStream);
-                        user.Img = memoryStream.ToArray();
+                      
                         model.Img = memoryStream.ToArray();
                    
                     }
@@ -70,13 +56,17 @@ namespace Hospital_Management.Controllers
                 }
 
             }
-           
+            var user = await services.GetUserByIdAsync(model.UserId);
             if (user != null) 
             {
                 user.Email =model.Email;
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.BirthDate = DateTime.Parse(model.BirthDate);
+                if (Img != null && Img.Length > 0)
+                {
+                    user.Img = model.Img;
+                }
               
                 var result = unit.Save();
                 if (result!=0)
@@ -127,6 +117,25 @@ namespace Hospital_Management.Controllers
             
            
            
+        } 
+        public async Task<IActionResult> VerifyUserName(string userName)
+        {
+            var testUser = await services.GetUserByUsernameAsync(userName);
+            if (testUser != null)
+            {
+                return Json($"Email {userName} is already in use.");
+            }
+            return Json(true);
+        }
+        public async Task<IActionResult> VerifyUser(UserProfileDataViewModel model)
+        {
+            
+            var existingUser = await services.GetUserByEmail(model.Email);
+            if (existingUser != null && existingUser.Id != model.UserId)
+            {
+                return Json($"Username or Email is already in use.");
+            }
+            return Json(true);
         }
     }
 }

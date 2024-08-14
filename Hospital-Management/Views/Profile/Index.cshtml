@@ -8,7 +8,7 @@
 
 <div class="profile-container">
     <form id="profileForm" asp-action="SaveChanges" asp-controller="Profile" method="post" enctype="multipart/form-data">
-        @Html.AntiForgeryToken()
+        
         <div class="grid-container">
             <div class="grid-item">
                 <label><strong>Profile Picture:</strong></label>
@@ -23,9 +23,11 @@
                 <input type="file" id="Img" name="Img" accept="image/*" asp-for="Img" disabled />
             </div>
             
+            
             <div class="grid-item">
                 <label><strong>Username:</strong></label>
                 <input type="text" id="UserName" value="@Model.UserName" asp-for="UserName" disabled />
+               
              
             </div>
             <div class="grid-item">
@@ -43,7 +45,9 @@
             <div class="grid-item">
                 <label><strong>Birth Date:</strong></label>
                 <input type="date" id="BirthDate" value="@Model.BirthDate" disabled asp-for="BirthDate" />
+                <input type="text" id="Userid" value="@Model.UserId" asp-for="UserId" style="display:" hidden />
             </div>
+            
          
         </div>
 
@@ -72,7 +76,10 @@
         border-radius: 10px;
         background-color: #f9f9f9;
     }
-
+    #Userid
+    {
+        display:none
+    }
     .grid-container {
         display: grid;
         grid-template-columns: 1fr 1fr;
