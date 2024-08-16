@@ -86,6 +86,11 @@ namespace Hospital_Management.Services
             return result.Succeeded;
         }
 
+        public async Task<TUser> GetUserByEmail(string email)
+        {
+            return await userManager.FindByEmailAsync(email);
+        }
+
         public Task<string> GetUserEmailAsync(TUser user)
         {
             return userManager.GetEmailAsync(user);
