@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hospital_Management.Areas.AdminPortal.Controllers
 {
@@ -39,8 +40,7 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
             {
                 DoctorId = doctor.Id,
                 FirstName = doctor.FirstName + " " + doctor.LastName,
-                SpecialityId = doctor.SpecialityId, // Assuming Doctor entity has a navigation property to Speciality
-                
+                SpecialityId = doctor.SpecialityId,
                 BirthDate = doctor.BirthDate,
                 Address = doctor.Address,
                 
@@ -52,17 +52,28 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
                 CurrentPage = page,
                 TotalPages = unitOfWork.DoctorRepository.GetTotalPages(pageSize),
                 Items = doctorVMs
+                
             };
 
             return View("Index", paginationVM);
         }
 
-
         [HttpPost]
-        public IActionResult Search(SearchVM<Doctor> searchVM)
+        public IActionResult Search(SearchVM<DoctorWithSpecialityVM> searchVM)
         {
-            searchVM.Items = unitOfWork.DoctorRepository.Search(searchVM.SearchString, searchVM.SearchProperty);
-            return View("Search", searchVM); 
+            
+
+            searchVM.Items = unitOfWork.DoctorRepository.Search(searchVM.SearchString, searchVM.SearchProperty)
+                .Select(doctor => new DoctorWithSpecialityVM
+                {
+                    DoctorId = doctor.Id,
+                    FirstName = doctor.FirstName + " " + doctor.LastName,
+                    SpecialityId = doctor.SpecialityId,
+                    BirthDate = doctor.BirthDate,
+                    Address = doctor.Address,
+                }).ToList(); 
+
+            return View("Search", searchVM);
         }
 
         public IActionResult Details(string id)
@@ -71,8 +82,30 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
             // CourseDetailsVM courseVM = CourseRepo.BindGetCourseDetails(id);
 
             Doctor doctorModel = unitOfWork.DoctorRepository.GetById(id);
+
+            DoctorDetailsVM doctorVM = new DoctorDetailsVM()
+            {
+                FirstName = doctorModel.FirstName,
+                LastName = doctorModel.LastName,
+                Address = doctorModel.Address,
+                BirthDate= doctorModel.BirthDate,
+                Img = doctorModel.Img,
+                SpecialityName = doctorModel.Speciality?.Name,
+                SpecialityId = doctorModel.SpecialityId,
+                Rates = doctorModel.Rates,
+                Articles    = doctorModel.Articles,
+                Reservations = doctorModel.Reservations,
+                Assistants = doctorModel.Assistants,
+                WorkingHours = doctorModel.WorkingHours,
+                WorkingDays = doctorModel.WorkingDays,
+                StartHour = doctorModel.StartHour,
+                ExaminationsMinutes = doctorModel.ExaminationsMinutes,
+                ExaminationFees = doctorModel.ExaminationFees,
+            };
+            
+
             if (doctorModel == null) return NotFound();
-            return View("Details", doctorModel);
+            return View("Details", doctorVM);
         }
 
         [HttpGet]
@@ -81,8 +114,7 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
             //var addDoctorVM = new DoctorDetailsVM();
 
             //addDoctorVM.Reservations = ReservationRepo.GetAll();
-            //addDoctorVM.Specialities = SpecialityRepo.GetAll();
-            var addDoctorVM = new DoctorDetailsVM()
+            DoctorWithSpecialityVM addDoctorVM = new DoctorWithSpecialityVM()
             {
                 Specialities = unitOfWork.SpecialityRepository.GetAll().Select(spec => new SelectListItem
                 {
@@ -117,9 +149,10 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
                 Img = await UploadImage(imgFile),
             };
 
-           
-                unitOfWork.DoctorRepository.Insert(doctor);
-                unitOfWork.DoctorRepository.Save();
+
+            //unitOfWork.DoctorRepository.Insert(doctor);
+            //unitOfWork.DoctorRepository.Save();
+            userServices.Register(doctor, "doctor1234", "Doctor");
                 ///////////////
            
             return RedirectToAction("Index");///////////////
@@ -127,26 +160,32 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
 
         //Doctor/Edit/Id=1
         [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        public IActionResult Edit(string id)
         {
             //var user = await userServices.GetUserByUsernameAsync(User.Identity.Name);
             //var userById = await userServices.GetUserByIdAsync(user.Id);
             var doctorByIdFromRepo = unitOfWork.DoctorRepository.GetById(id);
 
+            if (doctorByIdFromRepo == null)
+            {
+                // Handle the case where the doctor was not found
+                return NotFound();
+            }
+
             var editDoctorVM = new DoctorWithSpecialityVM()
             {
                 DoctorId = doctorByIdFromRepo.Id,
-                FirstName = doctorByIdFromRepo.FirstName, 
+                FirstName = doctorByIdFromRepo.FirstName,
                 LastName = doctorByIdFromRepo.LastName,
                 BirthDate = doctorByIdFromRepo.BirthDate,
                 Address = doctorByIdFromRepo.Address,
-                Img = doctorByIdFromRepo.Img,
+                Img = doctorByIdFromRepo?.Img,
                 SpecialityId = doctorByIdFromRepo.SpecialityId,
                 
-                Specialities = unitOfWork.SpecialityRepository.GetAll().Select(dept => new SelectListItem
+                Specialities = unitOfWork.SpecialityRepository.GetAll().Select(spec => new SelectListItem
                 {
-                    Value = dept.Id.ToString(),
-                    Text = dept.Name
+                    Value = spec.Id.ToString(),
+                    Text = spec.Name
                 }).ToList()
             };
 
@@ -196,7 +235,7 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
                 var doctor = unitOfWork.DoctorRepository.GetById(id);
                 if (doctor == null)
                 {
-                    return StatusCode(404, new { message = "Course not found." });
+                    return StatusCode(404, new { message = "Doctor not found." });
                 }
 
                 unitOfWork.DoctorRepository.Delete(id);

@@ -1,14 +1,16 @@
 ﻿@using Hospital_Management.Areas.AdminPortal.ViewModel
-@model Hospital_Management.Models.Doctor
+@model DoctorDetailsVM
 @{
-    ViewData["Title"] = "Details";
+ViewData["Title"] = $"{@Model.FullName} - Doctor";
+    ViewData["HeaderTitle"] = $"{@Model.FullName}";
+    ViewData["HeaderSubTitle"] = "Doctor";
 }
 
 <h1>Details</h1>
 
 
 <button class="btn btn-primary">
-    <a style="text-decoration:none" class="text-white" href="/doctor/Index">Back to All Doctors</a>
+    <a style="text-decoration:none" class="text-white" href="/adminportal/doctor/Index">Back to All Doctors</a>
 </button>
 <div>
     <p class="display-3">Details of Doctor: @Model.FullName</p>
@@ -28,11 +30,12 @@
                 <th>StartHour</th>
                 <th>ExaminationsMinutes</th>
                 <th>ExaminationFees</th>
+            <th>SpecialityName </th>
             </thead>
             <tr>
-                <td>@Model.Id</td>
+                <td>@Model.DoctorId</td>
                 <td>@Model.FullName</td>
-                @* <td>@Model?.Speciality.Name</td> *@
+                <td>@Model?.SpecialityName</td>
                 <td>@Model.BirthDate</td>
                 <td>@Model?.Address</td>
                 <td>@Model.WorkingDays</td>
@@ -42,7 +45,7 @@
                 <td>@Model.ExaminationFees</td>
 
                 <td>
-                    <a asp-controller="Speciality" asp-action="details" asp-route-id="@Model.SpecialityId">@Model.Speciality.Name</a>
+                    <a asp-controller="Speciality" asp-action="details" asp-route-id="@Model.SpecialityId">@Model.SpecialityName</a>
                 </td>
             </tr>
             <table />
@@ -60,7 +63,7 @@
                     <th>Id</th>
                     <th>ReservationStatus</th>
                 </tr>
-                @foreach (var item in Model.Reservations)
+                @foreach (var item in Model?.Reservations)
                 {
                     <tr class="text">
                         <td>@item.Id</td>
@@ -97,7 +100,7 @@
 
                         <td>
                             <button class="btn btn-primary">
-                                <a class="text-white" style="text-decoration:none" href="/Assistant/Details/@item.Id">Details</a>
+                                <a class="text-white" style="text-decoration:none" href="/AdminPortal/Assistant/Details/@item.Id">Details</a>
                             </button>
                         </td>
                     </tr>
@@ -160,9 +163,9 @@
 
             <div class="d-flex justify-content-around fs-5">
                 <button class="btn btn-warning">
-                    <a class="text-white" style="text-decoration:none" href="/doctor/edit/@Model.Id">Edit</a>
+                    <a class="text-white" style="text-decoration:none" href="/AdminPortal/doctor/edit/@Model.DoctorId">Edit</a>
                 </button>
-                <button class="btn btn-danger" onclick="confirmDelete(@Model.Id)">
+                <button class="btn btn-danger" onclick="confirmDelete(@Model.DoctorId)">
                     <a class="text-white" style="text-decoration:none" href="#">Remove</a>
                 </button>
             </div>
@@ -174,8 +177,8 @@
 
 <script>
     function confirmDelete(id) {
-        if (confirm("Are you sure you want to delete this course?")) {
-            fetch(`/doctor/Delete/${id}`, {
+        if (confirm("Are you sure you want to delete this doctor?")) {
+            fetch(`/AdminPortal/doctor/Delete/${id}`, {
                 method: "DELETE"
             })
                 .then(response => response.json().then(data => ({ status: response.status, message: data.message })))
@@ -199,7 +202,7 @@
 
         setTimeout(function () {
             notification.classList.remove("show");
-            location.href = "/doctor/Index";
+            location.href = "/AdminPortal/doctor/Index";
         }, 3000);
     }
 </script>
