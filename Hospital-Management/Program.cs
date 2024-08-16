@@ -1,3 +1,4 @@
+using Hospital_Management.Areas.AssistantPortal.Services;
 using Hospital_Management.Data;
 using Hospital_Management.Models;
 using Hospital_Management.Repository;
@@ -70,6 +71,7 @@ namespace Hospital_Management
             // Home services DI.
             builder.Services.AddScoped<IHomeServices, HomeServices>();
             #endregion
+            builder.Services.AddScoped<IAssistantSer, AssistantSer>();
 
             #region Authorization Policies
             builder.Services.AddAuthorization(options =>

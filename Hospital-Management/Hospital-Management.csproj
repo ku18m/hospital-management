@@ -28,9 +28,15 @@
     <Folder Include="Areas\AdminPortal\Data\" />
     <Folder Include="Areas\AdminPortal\Models\" />
     <Folder Include="Areas\AssistantPortal\Data\" />
-    <Folder Include="Areas\AssistantPortal\Models\" />
     <Folder Include="Areas\DoctorPortal\Data\" />
     <Folder Include="Areas\DoctorPortal\Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\Assistant\EditDoctor.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
