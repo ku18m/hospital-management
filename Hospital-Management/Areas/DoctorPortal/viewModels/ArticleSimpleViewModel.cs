@@ -1,6 +1,6 @@
 ﻿namespace Hospital_Management.ViewModels
 { 
-public class ArticleViewModel
+public class ArticleSimpleViewModel
 {
     public int Id { get; set; }
     public string Title { get; set; }
