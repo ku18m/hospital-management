@@ -1,4 +1,5 @@
 ﻿using Hospital_Management.Models;
+using Hospital_Management.Models.DataTypes;
 using Hospital_Management.Repository;
 using Hospital_Management.Services;
 using Hospital_Management.ViewModels;
@@ -16,25 +17,45 @@ namespace Hospital_Management.Controllers
        
         public async Task<IActionResult> Index()
         {
+
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var user = await services.GetUserByIdAsync(userId);
-           
-            var model = new UserProfileDataViewModel
+            if (userId != null)
             {
-                UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
-                UserName = User.Identity.Name,
-                Email = User.FindFirst(ClaimTypes.Email)?.Value,
-                FirstName = User.FindFirst(ClaimTypes.GivenName)?.Value,
-                LastName = User.FindFirst(ClaimTypes.Surname)?.Value,
-                BirthDate = User.FindFirst(ClaimTypes.DateOfBirth)?.Value,
-                Img = user.Img
-            };
-            if (User.IsInRole("patient"))
-            {
-                model.PatientRecord = unit.RecordRepository.GetById(model.UserId);
+                var model = new UserProfileDataViewModel
+                {
+                    UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+                    UserName = User.Identity.Name,
+                    Email = User.FindFirst(ClaimTypes.Email)?.Value,
+                    FirstName = User.FindFirst(ClaimTypes.GivenName)?.Value,
+                    LastName = User.FindFirst(ClaimTypes.Surname)?.Value,
+                    BirthDate = User.FindFirst(ClaimTypes.DateOfBirth)?.Value,
+                    Img = user.Img
+                };
+                var roles = await services.GetUserRolesAsync(user);
+                foreach (var role in roles)
+                {
+                    if (role == "patient")
+                    {
+                        Patient patient = user as Patient;
+                        model.PatientReservation = patient.Reservations.Take(5).Where(r => r.ReservationStatus == ReservationStatus.Pending).ToList();
+                    }
+                    else if (role == "doctor")
+                    {
+                        Doctor doctor = user as Doctor;
+                        model.DoctorRates = doctor.Rates.Take(5).Where(d => d.DoctorId == doctor.Id).ToList();
+
+                    }
+
+
+                }
+
+
+                return View(model);
             }
-            return View(model);
-           
+            
+              return  RedirectToAction("Login", "User");
+            
         }
         [HttpPost]
         public async Task<IActionResult> SaveChanges(UserProfileDataViewModel model, IFormFile Img)

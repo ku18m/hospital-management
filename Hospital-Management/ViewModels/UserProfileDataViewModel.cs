@@ -14,9 +14,9 @@ namespace Hospital_Management.ViewModels
             public string LastName { get; set; }
             public string BirthDate { get; set; }
             public byte[]? Img { get; set; }
-            public List<Record>? PatientRecord { get; set; }
-            public List<Record>? DoctorRecord { get; set; }
-            public List<Record>? AssistantRecord { get; set; }
+            public List<Reservation>? PatientReservation { get; set; }
+ 
+            public List<Rate>? DoctorRates { get; set; }
 
     }
 }
