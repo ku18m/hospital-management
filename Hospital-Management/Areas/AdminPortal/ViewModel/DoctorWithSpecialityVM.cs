@@ -13,7 +13,7 @@ namespace Hospital_Management.Areas.AdminPortal.ViewModel
         public string FullName => $"{FirstName} {LastName}";
 
         public int SpecialityId { get; set; }
-        public virtual List<SelectListItem> Specialities { get; set; }
+        public virtual List<SelectListItem>? Specialities { get; set; }
 
         public virtual Speciality? Speciality { get; set; }
 

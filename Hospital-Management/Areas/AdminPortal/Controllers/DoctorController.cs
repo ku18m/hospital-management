@@ -113,7 +113,6 @@ namespace Hospital_Management.Areas.AdminPortal.Controllers
         {
             //var addDoctorVM = new DoctorDetailsVM();
 
-            //addDoctorVM.Reservations = ReservationRepo.GetAll();
             DoctorWithSpecialityVM addDoctorVM = new DoctorWithSpecialityVM()
             {
                 Specialities = unitOfWork.SpecialityRepository.GetAll().Select(spec => new SelectListItem

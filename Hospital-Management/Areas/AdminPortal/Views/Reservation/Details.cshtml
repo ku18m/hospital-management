@@ -14,9 +14,7 @@
 </button>
 <div>
     <p class="display-3">Details of Reservation: </p>
-    <div class="container d-flex">
-        <img class="img-thumbnail m-auto" width="200" height="200" src="@Model.Patient.FullName" alt="image preview" />
-    </div>
+    
     <div class="container mt-2">
         <table class="table table-bordered table-hover text-center">
             <thead>
@@ -30,10 +28,10 @@
             <tr>
                 <td>@Model.Id</td>
                 <td>@Model.Date</td>
-                <td>@Model.Patient.FullName</td>
+                @* <td>@Model.Patient.FullName</td>
                 <td>@Model.Assistant.FullName</td>
                 <td>@Model.Doctor.FullName</td>
-
+ *@
                 <td>
                     <a asp-controller="Reservation" asp-action="details" asp-route-id="@Model.Id">@Model.ReservationStatus</a>
                 </td>

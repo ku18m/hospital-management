@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Add";
+    SelectList specLsit = new SelectList(Model.Specialities, "Id", "Name");
 }
 
 <h1>Add</h1>
@@ -20,14 +21,14 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="LastName">Name</label>
+            <label asp-for="LastName">Last Name</label>
             <input asp-for="LastName" class="form-control" />
             <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
 
         <div class="form-group">
             <label asp-for="BirthDate">BirthDate</label>
-            <input asp-for="BirthDate" class="form-control" />
+            <input asp-for="BirthDate" type="date" class="form-control" />
             <span asp-validation-for="BirthDate" class="text-danger"></span>
         </div>
 
@@ -45,7 +46,8 @@
 
         <div class="form-group">
             <label asp-for="SpecialityId">Speciality</label>
-            <select asp-for="SpecialityId" asp-items="@Model.Specialities" class="form-control">
+            <select asp-for="SpecialityId" asp-items="specList" class="form-control">
+                <option value="0">Select Speciality</option>
             </select>
             <span asp-validation-for="SpecialityId" class="text-danger"></span>
         </div>
