@@ -1,0 +1,16 @@
+﻿@model Hospital_Management.ViewModels.ShiftViewModel
+
+@{
+    ViewData["Title"] = "Start Shift";
+    var patientId = Model.PatientId;
+}
+
+
+@if (Model.PatientId != null)
+{
+    <a href="@Url.Action("ShiftPatientRecords", "Shift", new { Area = "DoctorPortal", patientId = Model.PatientId })" class="btn btn-primary">Start My Shift</a>
+}
+else
+{
+    <p>No reservations found.</p>
+}
