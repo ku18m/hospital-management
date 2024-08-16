@@ -44,7 +44,7 @@ namespace Hospital_Management.Repository
             context.Records.Add(record);
         }
 
-        void IRepository<Record>.Save()
+        public void Save()
         {
             context.SaveChanges();
         }

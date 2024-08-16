@@ -5,7 +5,7 @@ namespace Hospital_Management.Repository
 {
     public class PatientRepo(ApplicationDbContext context) : IPatientRepo
     {
-        public void Delete(int id)
+        public void Delete(string id)
         {
             var patient = context.Patients.Find(id);
             if (patient != null)
@@ -22,7 +22,7 @@ namespace Hospital_Management.Repository
                                                .ToList();
         }
 
-        public Patient GetById(int id)
+        public Patient GetById(string id)
         {
             return context.Patients.Include(p => p.Records)
                                    .Include(p => p.Reservations)

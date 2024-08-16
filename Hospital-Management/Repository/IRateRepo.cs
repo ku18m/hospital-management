@@ -2,7 +2,7 @@
 
 namespace Hospital_Management.Repository
 {
-    public interface IRateRepo: IRepository<Rate>
+    public interface IRateRepo: IRepository<Rate, int>
     {
     }
 }

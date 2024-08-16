@@ -1,8 +1,10 @@
+using Hospital_Management.Authorization;
 using Hospital_Management.Data;
 using Hospital_Management.Models;
 using Hospital_Management.Repository;
 using Hospital_Management.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,11 +68,37 @@ namespace Hospital_Management
 
             // Unit of work DI.
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Home services DI.
+            builder.Services.AddScoped<IHomeServices, HomeServices>();
+
+            // Article services DI.
+            builder.Services.AddScoped<IArticleServices, ArticleServices>();
+
+            // Speciality services DI.
+            builder.Services.AddScoped<ISpecialityServices, SpecialityServices>();
+
+            // Doctor services DI.
+            builder.Services.AddScoped<IDoctorServices, DoctorServices>();
+
+            // Reservation services DI.
+            builder.Services.AddScoped<IReservationServices, ReservationServices>();
+
+            // Email services DI.
+            builder.Services.AddTransient<IEmailServices, EmailServices>(); // Added as transient because it's not always needed.
+            
+            // Add Singleton for Confirmed Account Auth.
+            builder.Services.AddScoped<IAuthorizationHandler, ConfirmedAccountHandler>();
             #endregion
 
             #region Authorization Policies
             builder.Services.AddAuthorization(options =>
             {
+                // Add policy for confirmed account.
+                options.AddPolicy("ConfirmedAccount", policy => policy.Requirements.Add(new ConfirmedAccountRequirement()));
+
+                options.AddPolicy("LoggedInUser", policy => policy.RequireAuthenticatedUser());
+
                 options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
                 options.AddPolicy("RequireDoctorRole", policy => policy.RequireRole("Doctor"));
                 options.AddPolicy("RequireAssistantRole", policy => policy.RequireRole("Assistant"));
@@ -112,22 +140,6 @@ namespace Hospital_Management
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.MapRazorPages();
-
-
-            // Call DataSeeder.
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    await DataSeeder.SeedData(services);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
-                }
-            }
 
             app.Run();
         }
