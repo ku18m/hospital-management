@@ -5,13 +5,32 @@
     Layout = "~/Views/Shared/_CustomLayout.cshtml";
 }
 
+@if(ViewBag.Error != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.Error
+    </div>
+}
+else if (ViewBag.Success != null)
+{
+    <div class="alert alert-success" role="alert">
+        @ViewBag.Success
+    </div>
+}
 
 <div class="container mt-4">
     <h2>Book an Appointment</h2>
 
     <div class="row mb-4">
         <div class="col-md-4">
-            <img src="@(Model.Img != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(Model.Img)}" : "placeholder-image-url")" class="img-fluid" alt="@Model.Name" />
+            @if (Model.Img != null && Model.Img.Length > 0)
+            {
+                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Img)" alt="Doctor Image" class="card-img-top">
+            }
+            else
+            {
+                <img src="/images/d1.jpg" alt="" class="card-img-top">
+            }
         </div>
         <div class="col-md-8">
             <h3>@Model.Name</h3>

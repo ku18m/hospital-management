@@ -1,8 +1,10 @@
+using Hospital_Management.Authorization;
 using Hospital_Management.Data;
 using Hospital_Management.Models;
 using Hospital_Management.Repository;
 using Hospital_Management.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -81,11 +83,22 @@ namespace Hospital_Management
 
             // Reservation services DI.
             builder.Services.AddScoped<IReservationServices, ReservationServices>();
+
+            // Email services DI.
+            builder.Services.AddTransient<IEmailServices, EmailServices>(); // Added as transient because it's not always needed.
+            
+            // Add Singleton for Confirmed Account Auth.
+            builder.Services.AddScoped<IAuthorizationHandler, ConfirmedAccountHandler>();
             #endregion
 
             #region Authorization Policies
             builder.Services.AddAuthorization(options =>
             {
+                // Add policy for confirmed account.
+                options.AddPolicy("ConfirmedAccount", policy => policy.Requirements.Add(new ConfirmedAccountRequirement()));
+
+                options.AddPolicy("LoggedInUser", policy => policy.RequireAuthenticatedUser());
+
                 options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
                 options.AddPolicy("RequireDoctorRole", policy => policy.RequireRole("Doctor"));
                 options.AddPolicy("RequireAssistantRole", policy => policy.RequireRole("Assistant"));

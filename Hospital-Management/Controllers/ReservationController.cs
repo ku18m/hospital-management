@@ -1,9 +1,10 @@
 ﻿using Hospital_Management.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hospital_Management.Controllers
 {
-    public class ReservationController(IReservationServices reservationServices) : Controller
+    public class ReservationController(IReservationServices reservationServices, IEmailServices emailServices) : Controller
     {
         public IActionResult Index()
         {
@@ -25,6 +26,7 @@ namespace Hospital_Management.Controllers
             return Ok(reservations);
         }
 
+        [Authorize(policy: "ConfirmedAccount")]
         public async Task<IActionResult> Create(string doctorId, DateTime date)
         {
             var model = await reservationServices.GetDoctorWithResPropertiesAsync(doctorId);
@@ -32,9 +34,23 @@ namespace Hospital_Management.Controllers
             var result = await reservationServices.ReserveAsync(doctorId, date, userName);
 
 
-            if (result) return View("New", model);
+            if (result == null)
+            {
+                ViewBag.Error = "An Error Occured while booking your reservation";
+                return View("New", model);
+            }
 
+            try
+            {
+                var reservationEmailModel = await reservationServices.GetReservationEmailViewModelAsync(result.Id);
+                await emailServices.SendReservationDoneEmailAsync(reservationEmailModel);
+            }
+            catch
+            { }
+
+            ViewBag.Success = "Reservation created successfully.";
             return View("New", model);
+
         }
     }
 }
