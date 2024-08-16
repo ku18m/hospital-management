@@ -15,6 +15,7 @@ using System.Numerics;
 
 namespace Hospital_Management.Areas.AssistantPortal.Controllers
 {
+    [Area("AssistantPortal")]
     [Authorize(Policy = "RequireAssistantRole")]
     public class AssistantController:Controller
         //(IUserServices<ApplicationUser> userServices, IUnitOfWork unitOfWork,IAssistantSer assistantSer) : Controller
