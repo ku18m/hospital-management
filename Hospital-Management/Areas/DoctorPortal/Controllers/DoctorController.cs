@@ -140,7 +140,7 @@ namespace Hospital_Management.Areas.DoctorPortal.Controllers
 
             var pagedArticles = allArticles.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            var articleViewModels = pagedArticles.Select(a => new ArticleViewModel
+            var articleViewModels = pagedArticles.Select(a => new ArticleSimpleViewModel
             {
                 Id = a.Id,
                 Title = a.Title,
@@ -164,7 +164,7 @@ namespace Hospital_Management.Areas.DoctorPortal.Controllers
         }
 
         [HttpPost]
-        public IActionResult Save(ArticleViewModel model)
+        public IActionResult Save(ArticleSimpleViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -191,7 +191,7 @@ namespace Hospital_Management.Areas.DoctorPortal.Controllers
 
             if (article == null) return NotFound();
 
-            var articleVM = new ArticleViewModel
+            var articleVM = new ArticleSimpleViewModel
             {
                 Id = article.Id,
                 Title = article.Title,
@@ -206,7 +206,7 @@ namespace Hospital_Management.Areas.DoctorPortal.Controllers
         [HttpPost]
         [Route("DoctorPortal/Doctor/SaveEditArticle")]
 
-        public IActionResult SaveEditArticle(ArticleViewModel articleVM)
+        public IActionResult SaveEditArticle(ArticleSimpleViewModel articleVM)
         {
             if (ModelState.IsValid)
             {
