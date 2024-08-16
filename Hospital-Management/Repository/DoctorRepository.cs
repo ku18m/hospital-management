@@ -1,6 +1,7 @@
 ﻿using Hospital_Management.Data;
 using Hospital_Management.Models;
 using Hospital_Management.Models.DataTypes;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hospital_Management.Repository
 {
@@ -18,7 +19,7 @@ namespace Hospital_Management.Repository
 
         public Doctor GetById(string id)
         {
-            return context.Doctors.Find(id);
+            return context.Doctors.Include(d=>d.Reservations).Include(d=>d.Articles).Include(d => d.Assistants).Include(d => d.Speciality).Include(d => d.Rates).FirstOrDefault(d=>d.Id==id);
         }
 
         public List<Doctor> GetPage(int page)
@@ -61,7 +62,8 @@ namespace Hospital_Management.Repository
                     int.TryParse(searchString, out StartHour);
                     return context.Doctors.Where(docs => docs.StartHour == StartHour).ToList();
                 default: // Otherwise, search by name.
-                    return context.Doctors.Where(docs => docs.FullName.Contains(searchString)).ToList();
+                    return context.Doctors.Where(docs => docs.FirstName.Contains(searchString) || 
+                    docs.LastName.Contains(searchString)).ToList();
             }
         }
 
