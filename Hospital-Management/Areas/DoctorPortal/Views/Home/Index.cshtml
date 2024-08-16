@@ -2,6 +2,9 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    var userName = Model.UserName; 
 }
 
-<h1>Welcome Doctor</h1>
+<h1>Welcome Doctor, @userName</h1>
+
+<a href="@Url.Action("ShiftPatientRecords", "Shift", new { Area = "DoctorPortal" })" class="btn btn-primary">Start My Shift</a>

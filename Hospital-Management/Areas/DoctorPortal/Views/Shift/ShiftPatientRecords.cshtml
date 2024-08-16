@@ -1,0 +1,19 @@
+﻿@model Hospital_Management.ViewModels.PatientRecordsVM
+
+<h1>Patient: @Model.PatientName</h1>
+
+<h2>Records:</h2>
+<ul>
+    @foreach (var record in Model.Records)
+    {
+        <li>
+            <strong>@record.Date.ToString("d")</strong> - @record.Description
+            <br />
+            Diagnosis: @record.Diagnosis
+            <br />
+            Prescription: @record.Prescription
+            <br />
+            Notes: @record.Notes
+        </li>
+    }
+</ul>
