@@ -1,3 +1,4 @@
+using Hospital_Management.Areas.AssistantPortal.Services;
 using Hospital_Management.Authorization;
 using Hospital_Management.Data;
 using Hospital_Management.Models;
@@ -89,6 +90,9 @@ namespace Hospital_Management
             
             // Add Singleton for Confirmed Account Auth.
             builder.Services.AddScoped<IAuthorizationHandler, ConfirmedAccountHandler>();
+          
+            // Assistant Services DI.
+            builder.Services.AddScoped<IAssistantSer, AssistantSer>();
             #endregion
 
             #region Authorization Policies

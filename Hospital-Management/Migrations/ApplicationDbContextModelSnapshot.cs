@@ -182,7 +182,7 @@ namespace Hospital_Management.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("Articles");
+                    b.ToTable("Articles", (string)null);
 
                     b.HasData(
                         new
@@ -255,7 +255,7 @@ namespace Hospital_Management.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Rates");
+                    b.ToTable("Rates", (string)null);
 
                     b.HasData(
                         new
@@ -337,7 +337,7 @@ namespace Hospital_Management.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Records");
+                    b.ToTable("Records", (string)null);
 
                     b.HasData(
                         new
@@ -436,7 +436,7 @@ namespace Hospital_Management.Migrations
 
                     b.HasIndex("RateId");
 
-                    b.ToTable("Reservations");
+                    b.ToTable("Reservations", (string)null);
 
                     b.HasData(
                         new
@@ -500,7 +500,7 @@ namespace Hospital_Management.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specialities");
+                    b.ToTable("Specialities", (string)null);
 
                     b.HasData(
                         new

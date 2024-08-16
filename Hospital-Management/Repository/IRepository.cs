@@ -1,4 +1,6 @@
-﻿namespace Hospital_Management.Repository
+﻿using Hospital_Management.Models;
+
+namespace Hospital_Management.Repository
 {
     public interface IRepository<Entity, IdType>
     {
@@ -11,6 +13,6 @@
         public void Update(Entity entity);
         public void Delete(IdType id);
         public void Save();
-       
+
     }
 }
