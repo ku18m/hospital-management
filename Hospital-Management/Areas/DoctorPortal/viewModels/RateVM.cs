@@ -1,6 +1,6 @@
 ﻿namespace Hospital_Management.ViewModels
 {
-    public class RateViewModel
+    public class RateVM
     {
         public int Id { get; set; }
         public int Value { get; set; }

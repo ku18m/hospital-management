@@ -5,7 +5,7 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-
+<a href="/DoctorPortal/doctor/CreateRecord" class="btn btn-primary mb-3">Add New Record</a>
 <table class="table">
     <thead>
         <tr>
@@ -30,10 +30,8 @@
                 <td>@record.Date.ToString("d")</td>
                 <td>
                     <a href="@Url.Action("EditRecord", new { id = record.Id })" class="btn btn-primary">Edit</a>
-                    <a href="@Url.Action("DeleteRecord", new { id = record.Id })" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-<a asp-action="CreateRecord" class="btn btn-primary">Add New Record</a>

@@ -2,28 +2,39 @@
 using Hospital_Management.Models;
 using Hospital_Management.Repository;
 using Hospital_Management.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Hospital_Management.Areas.DoctorPortal.Controllers
 {
     [Area("DoctorPortal")]
+    [Authorize(Policy = "RequireDoctorRole")]
 
     public class DoctorController(ApplicationDbContext context, IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager) : Controller
     {
-        public IActionResult MyReservations()
+
+        public IActionResult MyReservations(string searchString = "", string searchProperty = "Status", int page = 1)
         {
             var doctorId = userManager.GetUserId(User);
-
+            int pageSize = 5;
+            var totalReservations = unitOfWork.ReservationRepository.Search(searchString, searchProperty);
+            int totalPages = (int)Math.Ceiling((double)totalReservations.Count / pageSize);
             var reservations = unitOfWork.ReservationRepository.GetByDoctorId(doctorId);
+            var pagedReservations = reservations.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            var reservationViewModels = reservations.Select(r => new ReservationViewModel
+
+            var reservationViewModels = pagedReservations.Select(r => new ReservationViewModel
             {
                 Id = r.Id,
                 PatientName = r.Patient.FullName,
                 Date = r.Date,
                 Status = r.ReservationStatus.ToString()
             }).ToList();
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.SearchString = searchString;
+            ViewBag.SearchProperty = searchProperty;
 
             return View(reservationViewModels);
         }
@@ -116,23 +127,20 @@ namespace Hospital_Management.Areas.DoctorPortal.Controllers
             return View("EditRecord", recordModel);
         }
 
-        public IActionResult DeleteRecord(int id)
-        {
-            var record = unitOfWork.RecordRepository.GetById(id);
-            if (record == null) return NotFound();
-            unitOfWork.RecordRepository.Delete(id);
-            unitOfWork.Save();
-
-            return RedirectToAction("PatientRecords");
-        }
-
         #region Articles
-
-        public IActionResult Articles()
+        public IActionResult Articles(string searchString = "", string searchProperty = "Title", int page = 1)
         {
             var doctorId = userManager.GetUserId(User);
-            var articles = unitOfWork.ArticleRepository.GetByDoctorId(doctorId);
-            var articleViewModels = articles.Select(a => new ArticleViewModel
+            int pageSize = 5;
+
+            var allArticles = unitOfWork.ArticleRepository.Search(searchString, searchProperty)
+                                    .Where(a => a.DoctorId == doctorId);
+
+            int totalPages = (int)Math.Ceiling((double)allArticles.Count() / pageSize);
+
+            var pagedArticles = allArticles.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var articleViewModels = pagedArticles.Select(a => new ArticleViewModel
             {
                 Id = a.Id,
                 Title = a.Title,
@@ -140,16 +148,23 @@ namespace Hospital_Management.Areas.DoctorPortal.Controllers
                 DateTime = a.DateTime,
                 DoctorId = a.DoctorId
             }).ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.SearchString = searchString;
+            ViewBag.SearchProperty = searchProperty;
+
             return View("Articles", articleViewModels);
         }
 
+        [HttpGet]
         public IActionResult CreateArticle()
         {
             return View("CreateArticle");
         }
 
         [HttpPost]
-        public IActionResult CreateArticle(ArticleViewModel model)
+        public IActionResult Save(ArticleViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -161,17 +176,21 @@ namespace Hospital_Management.Areas.DoctorPortal.Controllers
                     DoctorId = userManager.GetUserId(User)
                 };
                 unitOfWork.ArticleRepository.Insert(article);
-                unitOfWork.Save(); 
-                return RedirectToAction("Articles");
+                unitOfWork.Save();
+                return View("Articles");
             }
+
             return View("CreateArticle", model);
         }
-
         [HttpGet]
         public IActionResult EditArticle(int id)
         {
+
             var article = unitOfWork.ArticleRepository.GetById(id);
+
+
             if (article == null) return NotFound();
+
             var articleVM = new ArticleViewModel
             {
                 Id = article.Id,
@@ -180,54 +199,61 @@ namespace Hospital_Management.Areas.DoctorPortal.Controllers
                 DateTime = article.DateTime,
                 DoctorId = article.DoctorId
             };
+
             return View("EditArticle", articleVM);
         }
 
         [HttpPost]
-        public IActionResult SaveEditArticle(ArticleViewModel model)
+        [Route("DoctorPortal/Doctor/SaveEditArticle")]
+
+        public IActionResult SaveEditArticle(ArticleViewModel articleVM)
         {
             if (ModelState.IsValid)
             {
-                var article = unitOfWork.ArticleRepository.GetById(model.Id);
+                var article = unitOfWork.ArticleRepository.GetById(articleVM.Id);
                 if (article == null) return NotFound();
-                article.Title = model.Title;
-                article.Content = model.Content;
-                article.DateTime = model.DateTime;
+                article.Title = articleVM.Title;
+                article.Content = articleVM.Content;
+                article.DateTime = articleVM.DateTime;
                 unitOfWork.ArticleRepository.Update(article);
-                unitOfWork.Save(); 
+                unitOfWork.Save();
                 return RedirectToAction("Articles");
+
             }
-            return View("EditArticle", model);
+
+            return View("EditArticle", articleVM);
         }
 
-        public IActionResult DeleteArticle(int id)
-        {
-            var article = unitOfWork.ArticleRepository.GetById(id);
-            if (article == null) return NotFound();
-            unitOfWork.ArticleRepository.Delete(id);
-            unitOfWork.Save();
-
-            return RedirectToAction("Articles");
-        }
 
         #endregion
-        public IActionResult ViewRates()
+        public IActionResult ViewRates(string searchString = "", string searchProperty = "Value", int page = 1)
         {
-            var doctorId = userManager.GetUserId(User);
+            int pageSize = 5;
 
-            var rates = unitOfWork.RateRepository.GetByDoctorId(doctorId);
+            var filteredRates = unitOfWork.RateRepository.Search(searchString, searchProperty);
 
-            var rateViewModels = rates.Select(r => new RateViewModel
+            int totalPages = (int)Math.Ceiling((double)filteredRates.Count / pageSize);
+
+            var rates = filteredRates
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var rateViewModels = rates.Select(r => new RateVM
             {
                 Id = r.Id,
                 Value = r.Value,
-                Comment = r.Comment,
-                PatientName = r.Patient.FullName
+                Comment = r.Comment ?? string.Empty,
+                PatientName = r.Patient?.FullName ?? string.Empty
             }).ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.SearchString = searchString;
+            ViewBag.SearchProperty = searchProperty;
 
             return View("ViewRates", rateViewModels);
         }
-
 
     }
 }
