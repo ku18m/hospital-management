@@ -21,7 +21,7 @@ namespace Hospital_Management.Repository
                                                .Include(p => p.Rates)
                                                .ToList();
         }
-
+      
         public Patient GetById(string id)
         {
             return context.Patients.Include(p => p.Records)
