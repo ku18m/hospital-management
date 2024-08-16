@@ -1,5 +1,4 @@
-﻿@using System.Security.Claims
-@model HomeViewModel
+﻿@model HomeViewModel
 @{
     Layout = null;
 }
@@ -69,7 +68,7 @@
                                 <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/home/about"> About</a>
+                                <a class="nav-link" href="/article">Articles</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="/speciality">Departments</a>
@@ -122,7 +121,7 @@
                                                 @(article.Content.Length > 100 ? $"{article.Content.Substring(0, 100)} ..." : article.Content)
                                             </p>
                                             <div class="btn-box">
-                                                <a href="/articles/@article.Id" class="btn1">
+                                                <a href="/article/@article.Id" class="btn1">
                                                     Read More
                                                 </a>
                                             </div>
@@ -255,7 +254,7 @@
                             <div class="detail-box">
                                 <div class="social_box">
                                     <a href="/reservation/new?doctorid=@doctor.Id">
-                                        Make Reservation
+                                        Book An Appointment
                                     </a>
                                 </div>
                                 <h5>
@@ -461,8 +460,8 @@
                             <a class="" href="/">
                                 Home
                             </a>
-                            <a class="" href="/home/about">
-                                About
+                            <a class="" href="/article">
+                                Articles
                             </a>
                             <a class="" href="/speciality">
                                 Departments
@@ -515,6 +514,18 @@
     <!-- End Google Map -->
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.dropdown').on('show.bs.dropdown', function () {
+                $(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
+            });
+
+            $('.dropdown').on('hide.bs.dropdown', function () {
+                $(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
+            });
+        });
+    </script>
 
 </body>
 
