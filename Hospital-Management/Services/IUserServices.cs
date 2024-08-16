@@ -14,5 +14,11 @@ namespace Hospital_Management.Services
         Task<IList<string>> GetUserRolesAsync(TUser user);
         Task<bool> AddUserToRoleAsync(TUser user, string role);
         Task<bool> RemoveUserFromRoleAsync(TUser user, string role);
+        Task<string> GenerateEmailConfirmationTokenAsync(TUser user);
+        Task<string> GetUserEmailAsync(TUser user);
+        Task<bool> ConfirmEmailAsync(TUser user, string token);
+        Task<string> GenerateEmailPasswordResetTokenAsync(TUser user);
+        Task<TUser> GetUserByEmailAsync(string email);
+        Task ResetPasswordAsync(TUser user, string token, string newPassword);
     }
 }

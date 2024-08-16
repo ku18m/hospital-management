@@ -511,6 +511,5 @@ namespace Hospital_Management.Data
 
             #endregion
         }
-        public DbSet<Hospital_Management.ViewModels.ArticleViewModel> ArticleViewModel { get; set; } = default!;
     }
 }

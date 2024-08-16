@@ -65,7 +65,7 @@ namespace Hospital_Management.Services
             return availableReservations;
         }
 
-        public async Task<bool> ReserveAsync(string doctorId, DateTime date, string userName)
+        public async Task<Reservation> ReserveAsync(string doctorId, DateTime date, string userName)
         {
             // Get the doctor.
             var doctorIdAndAssId = await context.Doctors
@@ -97,7 +97,22 @@ namespace Hospital_Management.Services
             // Save the changes.
             await context.SaveChangesAsync();
 
-            return true;
+            return reservation;
+        }
+
+        public Task<ReservationEmailViewModel> GetReservationEmailViewModelAsync(int reservationId)
+        {
+            var model = context.Reservations
+                .Where(r => r.Id == reservationId)
+                .Select(r => new ReservationEmailViewModel
+                {
+                    DoctorName = r.Doctor.FullName,
+                    PatientName = r.Patient.FullName,
+                    PatientEmail = r.Patient.Email,
+                    Date = r.Date,
+                }).FirstOrDefaultAsync();
+
+            return model;
         }
     }
 }

@@ -3,17 +3,19 @@ using Hospital_Management.Services;
 using Hospital_Management.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace Hospital_Management.Controllers
 {
-    public class UserController(IUserServices<ApplicationUser> userServices) : Controller
+    public class UserController(IUserServices<ApplicationUser> userServices, IEmailServices emailServices) : Controller
     {
+        [Authorize(policy: "ConfirmedAccount")]
         public async Task<IActionResult> Index()
         {
-            return View();
+            return Ok();
         }
 
         [HttpGet]
@@ -40,7 +42,7 @@ namespace Hospital_Management.Controllers
                     BirthDate = model.DateOfBirth,
                     Address = model.Address,
                     PhoneNumber = model.PhoneNumber,
-                    EmailConfirmed = true
+                    EmailConfirmed = false,
                 };
 
                 var result = await userServices.Register(user, model.Password);
@@ -122,5 +124,123 @@ namespace Hospital_Management.Controllers
 
         public IActionResult AccessDenied() => View("AccessDenied");
 
+        [Authorize(policy: "LoggedInUser")]
+        public IActionResult NotConfirmedAccount() => View();
+
+        [Authorize(policy: "LoggedInUser")]
+        public async Task<IActionResult> SendConfirmationMail()
+        {
+            var user = await userServices.GetUserByUsernameAsync(User.Identity.Name);
+            var token = await userServices.GenerateEmailConfirmationTokenAsync(user);
+            var urlHelper = Url;
+
+            try
+            {
+                await emailServices.SendConfirmationEmailAsync(user, token, urlHelper);
+                ViewBag.Success = "A confirmation email has been sent to your email address. Please confirm your email to continue.";
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "An error occured while sending the confirmation email. Please try again later.";
+                return View("NotConfirmedAccount");
+            }
+
+            return View("NotConfirmedAccount");
+        }
+
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            var user = await userServices.GetUserByIdAsync(userId);
+
+            var result = await userServices.ConfirmEmailAsync(user, token);
+
+            if (!result)
+            {
+                return RedirectToAction("NotConfirmedAccount");
+            }
+
+            if (User.Identity.IsAuthenticated) userServices.Logout();
+
+            return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Invalid email address.");
+                return View(model);
+            }
+
+            var user = await userServices.GetUserByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                return View(model);
+            }
+
+            var token = await userServices.GenerateEmailPasswordResetTokenAsync(user);
+            var urlHelper = Url;
+
+            try
+            {
+                await emailServices.SendPasswordResetEmailAsync(user, token, urlHelper);
+                ViewBag.Success = "A password reset email has been sent to your email address. Please reset your password to continue.";
+            }
+            catch (Exception)
+            {
+                ViewBag.Error = "An error occured while sending the password reset email. Please try again later.";
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string userId, string token)
+        {
+            var model = new ResetPasswordViewModel
+            {
+                UserId = userId,
+                Token = token,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Invalid password.");
+                return View(model);
+            }
+
+            var user = await userServices.GetUserByIdAsync(model.UserId);
+
+            if (user == null)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                await userServices.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "An error occured while resetting your password.");
+                return View(model);
+            }
+
+            return RedirectToAction("Login");
+        }
     }
 }
