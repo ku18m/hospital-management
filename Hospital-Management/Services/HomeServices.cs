@@ -18,10 +18,11 @@ namespace Hospital_Management.Services
             model.HomeDoctors = await context.Doctors
                 .OrderBy(d => d.Rates.Average(r => r.Value))
                 .Take(3)
+                .Include(d => d.Speciality)
                 .ToListAsync();
 
             model.HomeTestimonial = await context.Rates
-                .OrderBy(r => r.Value)
+                .OrderByDescending(r => r.Value)
                 .Take(3)
                 .Select(r => new RateViewModel
                 {
