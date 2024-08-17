@@ -14,7 +14,6 @@ The **Hospital Management System** is a comprehensive web application built usin
 - [Team Members](#team-members)
 - [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
 
 ## Features
 
