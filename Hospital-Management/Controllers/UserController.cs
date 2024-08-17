@@ -79,28 +79,10 @@ namespace Hospital_Management.Controllers
             {
                 var user = await userServices.GetUserByUsernameAsync(User.Identity.Name);
                 var roles = await userServices.GetUserRolesAsync(user);
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.GivenName, user.FirstName),
-                    new Claim(ClaimTypes.Surname, user.LastName),
-                    new Claim(ClaimTypes.DateOfBirth, user.BirthDate.ToString("yyyy-MM-dd")),
-                    new Claim(ClaimTypes.AuthorizationDecision, (user.EmailConfirmed || user.PhoneNumberConfirmed).ToString()),
-                };
-                foreach (var role in roles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
-                }
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = model.RememberMe,
-                    ExpiresUtc = model.RememberMe ? DateTimeOffset.UtcNow.AddDays(15) : null
-                };
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                await SetClaimsAsync(user, roles, model.RememberMe);
+                
 
                 return roles switch
                 {
@@ -159,7 +141,12 @@ namespace Hospital_Management.Controllers
                 return RedirectToAction("NotConfirmedAccount");
             }
 
-            if (User.Identity.IsAuthenticated) userServices.Logout();
+            if (User.Identity.IsAuthenticated)
+            {
+                await userServices.Logout();
+
+                SetClaimsAsync(user, await userServices.GetUserRolesAsync(user));
+            }
 
             return RedirectToAction("Login");
         }
@@ -241,6 +228,33 @@ namespace Hospital_Management.Controllers
             }
 
             return RedirectToAction("Login");
+        }
+
+
+        public async Task SetClaimsAsync(ApplicationUser user, IList<string> roles, bool isPersistent = false)
+        {
+            var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.GivenName, user.FirstName),
+                    new Claim(ClaimTypes.Surname, user.LastName),
+                    new Claim(ClaimTypes.DateOfBirth, user.BirthDate.ToString("yyyy-MM-dd")),
+                    new Claim(ClaimTypes.AuthorizationDecision, (user.EmailConfirmed || user.PhoneNumberConfirmed).ToString()),
+                };
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = isPersistent,
+                ExpiresUtc = isPersistent ? DateTimeOffset.UtcNow.AddDays(15) : null
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
         }
     }
 }
