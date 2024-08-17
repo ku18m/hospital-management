@@ -2,7 +2,9 @@
 {
     public class PatientRecordsVM
     {
-        public string PatientName { get; set; }
+        public string PatientId { get; set; }
+
+        public string ?PatientName { get; set; }
         
         public List<RecordViewModel> Records { get; set; }
     }
