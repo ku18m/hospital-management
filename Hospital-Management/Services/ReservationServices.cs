@@ -42,7 +42,6 @@ namespace Hospital_Management.Services
                     Description = "Description",
                 }).ToListAsync();
 
-
             // Store doctors working times to use it to generate all possible reservations.
             var doctorStartHour = date.AddHours(doctor.StartHour);
             var doctorEndHour = date.AddHours(doctor.StartHour + doctor.WorkingHours);

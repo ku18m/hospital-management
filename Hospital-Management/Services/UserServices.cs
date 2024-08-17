@@ -1,5 +1,9 @@
 ﻿using Hospital_Management.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using System.Data;
+using System.Security.Claims;
 
 namespace Hospital_Management.Services
 {
