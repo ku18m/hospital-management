@@ -31,7 +31,21 @@ namespace Hospital_Management.Services
         public async Task<List<ReservationInListViewModel>> GetReservationsInListAsync(string doctorId, DateTime date)
         {
             // Get the doctor.
-            var doctor = await context.Doctors.FindAsync(doctorId);
+            var doctorReservationProperties = await context.Doctors
+                .Where(d => d.Id == doctorId)
+                .Select(d => new {
+                    StartHour = d.StartHour,
+                    WorkingHours = d.WorkingHours,
+                    ExaminationMinutes = d.ExaminationsMinutes
+                })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            // Check if the doctor not found.
+            if(doctorReservationProperties == null)
+            {
+                return new List<ReservationInListViewModel>();
+            }
 
             // Get the taken reservations.
             var takenReservations = await context.Reservations
@@ -40,12 +54,14 @@ namespace Hospital_Management.Services
                 {
                     Date = r.Date,
                     Description = "Description",
-                }).ToListAsync();
+                })
+                .AsNoTracking()
+                .ToListAsync();
 
 
             // Store doctors working times to use it to generate all possible reservations.
-            var doctorStartHour = date.AddHours(doctor.StartHour);
-            var doctorEndHour = date.AddHours(doctor.StartHour + doctor.WorkingHours);
+            var doctorStartHour = date.AddHours(doctorReservationProperties.StartHour);
+            var doctorEndHour = date.AddHours(doctorReservationProperties.StartHour + doctorReservationProperties.WorkingHours);
 
             // Generate all possible reservations.
             var allReservations = new List<ReservationInListViewModel>();
@@ -56,7 +72,7 @@ namespace Hospital_Management.Services
                     Date = doctorStartHour,
                     Description = doctorStartHour.ToString("hh:mm tt"),
                 });
-                doctorStartHour = doctorStartHour.AddMinutes(doctor.ExaminationsMinutes);
+                doctorStartHour = doctorStartHour.AddMinutes(doctorReservationProperties.ExaminationMinutes);
             }
 
             // Get the available reservations by removing the taken ones.
