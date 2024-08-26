@@ -1,15 +1,16 @@
-﻿@model IEnumerable<Hospital_Management.ViewModels.RecordViewModel>
+﻿
+ @model IEnumerable<Hospital_Management.ViewModels.RecordViewModel>
 
 @{
-    ViewData["Title"] = "Patient Records";
+    ViewData["Title"] = "Patients Records";
 }
-
-<h2>@ViewData["Title"]</h2>
-<a href="/DoctorPortal/doctor/CreateRecord" class="btn btn-primary mb-3">Add New Record</a>
+<h1 class="text-center">@ViewData["Title"]</h1>
+<a href="/DoctorPortal/Doctor/CreateRecord" class="btn btn-primary mb-3">Add New Record</a>
 <table class="table">
     <thead>
         <tr>
             <th>Id</th>
+            <th>Patient Name</th>
             <th>Description</th>
             <th>Diagnosis</th>
             <th>Prescription</th>
@@ -23,7 +24,8 @@
         {
             <tr>
                 <td>@record.Id</td>
-                <td>@record.Description</td>
+                <td>@record.PatientName</td>
+                 <td>@record.Description</td>
                 <td>@record.Diagnosis</td>
                 <td>@record.Prescription</td>
                 <td>@record.Notes</td>
@@ -35,3 +37,4 @@
         }
     </tbody>
 </table>
+ 

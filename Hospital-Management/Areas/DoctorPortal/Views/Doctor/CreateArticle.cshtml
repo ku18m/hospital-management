@@ -13,21 +13,20 @@
 <form action="/DoctorPortal/Doctor/Save" method="post">
     <div class="form-group">
         <label asp-for="Title" class="control-label">Title</label>
-        <input name="Title" class="form-control"/>
+        <input name="Title" value="@Model?.Title" class="form-control"/>
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="Content" class="control-label">Content</label>
-        <textarea name="Content" class="form-control"></textarea>
+        <textarea name="Content" value="@Model?.Content" class="form-control"></textarea>
         <span asp-validation-for="Content" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="DateTime" class="control-label">Date and Time</label>
-        <input name="DateTime" class="form-control" type="datetime-local" />
+        <input name="DateTime" value="@Model?.DateTime" class="form-control" type="datetime-local" />
         <span asp-validation-for="DateTime" class="text-danger"></span>
     </div>
     <div class="form-group">
         <button type="submit" class=" btn btn-primary">Create</button>
-        @*  <input type="submit" value="Save" class="btn btn-primary" /> *@
     </div>
 </form>
